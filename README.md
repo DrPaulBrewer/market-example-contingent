@@ -60,7 +60,9 @@ See also the MarketEngine documentation in package `market-engine`, as the marke
 // 13     trigb: //  triggers new buy limit order asap
 // 14     trigs: //  triggers new sell limit order asap
 // 15     trigbs: // triggers new buy stop order asap
-// 16     trigss: // triggers new sell stop order asap
+// 16     trigbsp: // limit price if triggered buy stop is activated
+// 17     trigss: // triggers new sell stop order asap
+// 18     trigssp: // limit price if triggered sell stop is activated
 // ]
 </pre>
 
