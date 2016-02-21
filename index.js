@@ -1,3 +1,8 @@
+// Copyright 2016 Paul Brewer, Economic and FInancial Technology Consulting LLC 
+// This is open source software. The MIT License applies to this software.
+// see https://opensource.org/licenses/MIT or included License.md file
+
+
 /* jshint node:true,esnext:true,eqeqeq:true,undef:true,lastsemic:true */
 
 // order format
