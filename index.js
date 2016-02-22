@@ -92,14 +92,14 @@ var Market = function(options){
 	    });
 	}
     });
+    this.on('trade', this.tradeTrigger);
     this.on('trade-cleanup', function(tradespec){
 	var matches;
 	while (Math.max.apply(Math,(matches = this.stopsMatch(tradespec)))>0){
 	    this.emit('stops', tradespec.t, matches);
 	}
-	this.tradeTrigger(tradespec);
-	this.cleanup();
     });
+    this.on('trade-cleanup', this.cleanup);
     this.on('stops', this.stopsTrigger);
     this.clear();
 };
@@ -178,7 +178,9 @@ Market.prototype.triggerOrderToInbox = function(j,q,t){
 	if ((myorder[trigSliceBegin]>0) ||
 	    (myorder[trigSliceBegin+1]>0) ||
 	    (myorder[trigSliceBegin+2]>0) ||
-	    (myorder[trigSliceBegin+3]>0)){
+	    (myorder[trigSliceBegin+3]>0) ||
+	    (myorder[trigSliceBegin+4]>0) ||
+	    (myorder[trigSliceBegin+5]>0)){
 	    trigorder = [];
 	    for(ii=0,ll=trigSliceEnd-2;ii<ll;++ii)
 		trigorder[ii] = 0;

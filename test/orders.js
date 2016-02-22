@@ -150,7 +150,7 @@ module.exports = {
     id3_buystop_1_at_112: [
 	0,    // t
 	0,    // tx
-	2,    // usernum
+	3,    // usernum
 	0,    // cancelreplace
 	1,    // quantity
 	0,    // buy price
@@ -235,8 +235,61 @@ module.exports = {
 	0,    // trgger sell price
 	0,0,    // trigger buy stop
 	0,0     // trigger sell stop
-    ]
+    ],
 
+    id4_buy_1_at_110_triggers_buy_1_at_120: [
+	0,    // t
+	0,    // tx
+	4,    // usernum
+	1,    // cancelreplace
+	1,    // quantity
+	110,    // buy price
+	0,    // sell price
+	0,  // buy stop
+	0, // limit
+	0,    // sell stop
+	0,    // limit
+	120,    // trigger buy price
+	0,    // trgger sell price
+	0,0,    // trigger buy stop
+	0,0     // trigger sell stop
+    ],
+
+    id4_buy_1_at_110_triggers_sell_1_at_120_stoplimit_100: [
+	0,    // t
+	0,    // tx
+	4,    // usernum
+	0,    // cancelreplace
+	1,    // quantity
+	110,    // buy price
+	0,      // sell price
+	0,      // buy stop
+	0,      // limit
+	0,      // sell stop
+	0,      // limit
+	0,    // trigger buy price
+	120,      // trgger sell price
+	0,0,    // trigger buy stop
+	100,100     // trigger sell stop
+    ],
+
+    id4_sell_1_at_120_OCO_100: [
+	0,    // t
+	0,    // tx
+	4,    // usernum
+	0,    // cancelreplace
+	1,    // quantity
+	0,    // buy price
+	120,      // sell price
+	0,      // buy stop
+	0,      // limit
+	100,      // sell stop
+	100,      // limit
+	0,    // trigger buy price
+	0,      // trgger sell price
+	0,0,    // trigger buy stop
+	0,0     // trigger sell stop
+    ]
     
 }
 

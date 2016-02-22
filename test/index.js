@@ -681,5 +681,71 @@ describe('Market', function(){
 	    assert.ok(AM.book.sellStop.idx.length === 0);
 	});
     });
+
+    describe('buy triggers another buy', function(){
+	var scenario = [
+	    orders.id2_sell_1_at_95,
+	    orders.id2_sell_1_at_105,
+	    orders.id2_sell_1_at_115,
+	    orders.id4_buy_1_at_110_triggers_buy_1_at_120
+	];
+	var AM = new Market({});
+	var trades=[], stops = [];
+	AM.on('trade', function(tradespec){ trades.push(tradespec) });
+	AM.on('stops', function(t, matches){ stops.push(matches) });
+	process(AM, scenario);
+	it('should have empty inbox', function(){
+	    assert.ok(AM.inbox.length === 0);
+	});
+	it('should not execute any stops', function(){
+	    assert.ok(stops.length === 0);
+	});
+	it('should generate 2 trades', function(){
+	    assert.equal(trades.length, 2);
+	});
+	it('should generate trade prices of 95 and 105', function(){
+	    assert.equal(trades[0].prices[0], 95);
+	    assert.equal(trades[1].prices[0], 105);
+	});
+	it('should have empty buy book', function(){
+	    assert.ok(AM.book.buy.idx.length === 0);
+	});
+	it('should have sell book with one order at 115', function(){
+	    assert.ok(AM.book.sell.idx.length === 1);
+	    assert.ok(AM.book.sell.val(0) === 115);
+	});
+    });
+
+    describe('buy triggers OCO bracket sell-to-close', function(){
+	var scenario = [
+	    orders.id2_sell_1_at_95,
+	    orders.id2_sell_1_at_105,
+	    orders.id2_sell_1_at_115,
+	    orders.id4_buy_1_at_110_triggers_sell_1_at_120_stoplimit_100
+	    ];
+	var AM = new Market({});
+	var trades=[], stops = [];
+	AM.on('trade', function(tradespec){ trades.push(tradespec) });
+	AM.on('stops', function(t, matches){ stops.push(matches) });
+	process(AM, scenario);
+	it('should have empty inbox', function(){
+	    assert.ok(AM.inbox.length === 0);
+	});
+	it('should not execute any stops', function(){
+	    assert.ok(stops.length === 0);
+	});
+	it('should generate 1 trade', function(){
+	    assert.equal(trades.length, 1);
+	});
+	it('should have empty buy book', function(){
+	    assert.equal(AM.book.buy.idx.length, 0);
+	});
+	it('should have 3 orders in sell book', function(){
+	    assert.equal(AM.book.sell.idx.length, 3);
+	});
+	it('should have 120 OCO stoplimit 100 as last sell book order', function(){
+	    omit2(AM.book.sell.idxdata(2)).should.deepEqual(orders.id4_sell_1_at_120_OCO_100);
+	});
+    }); 
     
 });
