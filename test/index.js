@@ -1,6 +1,8 @@
 const assert = require('assert');
 const should = require('should');
-const Market = require('../index.js').Market;
+const marketExampleContingent = require('../index.js');
+const Market = marketExampleContingent.Market;
+const orderHeader = marketExampleContingent.orderHeader;
 const orders = require('./orders.js');
 
 function process(M,orders){
@@ -16,6 +18,15 @@ function process(M,orders){
 function omit2(a){
     return a.slice(2);
 }
+
+describe('orderHeader', function(){
+    it('should be an Array', function(){
+	assert.ok(Array.isArray(orderHeader));
+    });
+    it('should have 19 elements', function(){
+	assert.equal(orderHeader.length, 19);
+    });
+});
 
 describe('Market', function(){
     it('should be a function', function(){

@@ -33,7 +33,32 @@ const MarketEngine = require('market-engine');
 const marketPricing = require('market-pricing');
 const PartialIndex = require('partial-index');
 
+// orderHeader is defined for ease of writing a header line for orders to a CSV file or a table heading
+var orderHeader = [
+    'count',
+    'tlocal',
+    't',
+    'tx',
+    'id',
+    'cancel',
+    'q',
+    'buyPrice',
+    'sellPrice',
+    'buyStop',
+    'buyStopPrice',
+    'sellStop',
+    'sellStopPrice',
+    'triggersBuyPrice',
+    'triggersSellPrice',
+    'triggersBuyStop',
+    'triggersBuyStopPrice',
+    'triggersSellStop',
+    'triggersSellStopPrice'
+];
+
+
 var Market = function(options){
+    // defaults defined standard this.o.tCol, etc. is authoritative for locating particular data in an order
     var defaults = { 
 	pushArray:1,
 	countCol:0,
@@ -267,6 +292,7 @@ Market.prototype.tradeLog = function(tradespec){
 
 
 
+module.exports.orderHeader = orderHeader;
 module.exports.Market = Market;
 
 
