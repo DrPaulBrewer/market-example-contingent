@@ -56,6 +56,18 @@ var orderHeader = [
     'triggersSellStopPrice'
 ];
 
+var oa = function(oin){
+    var a = [];
+    var i,l;
+    if (typeof(oin)==='object'){
+	for(i=2,l=orderHeader.length;i<l;++i){
+	    a[i-2] = obj[orderHeader[i]];
+	    if (!a[i-2]) a[i-2] = 0;
+	}
+    }  
+    return a;	
+};
+
 
 var Market = function(options){
     // defaults defined standard this.o.tCol, etc. is authoritative for locating particular data in an order
@@ -293,6 +305,7 @@ Market.prototype.tradeLog = function(tradespec){
 
 
 module.exports.orderHeader = orderHeader;
+module.exports.oa = oa;
 module.exports.Market = Market;
 
 
