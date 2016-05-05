@@ -3,6 +3,7 @@ const should = require('should');
 const marketExampleContingent = require('../index.js');
 const Market = marketExampleContingent.Market;
 const orderHeader = marketExampleContingent.orderHeader;
+const oa = marketExampleContingent.oa;
 const orders = require('./orders.js');
 
 function process(M,orders){
@@ -27,6 +28,19 @@ describe('orderHeader', function(){
 	assert.equal(orderHeader.length, 19);
     });
 });
+
+describe('oa', function(){
+    it('should be a function', function(){
+	oa.should.be.type('function');
+    });
+    it('oa({}) should return a 17 element array of zeroes', function(){
+	oa({}).should.deepEqual([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+    });
+    it('oa({q:3, buyPrice: 100}) should return [0,0,0,0,3,100,0,...,0]', function(){
+	oa({q:3, buyPrice:100}).should.deepEqual([0,0,0,0,3,100,0,0,0,0,0,0,0,0,0,0,0]);
+    });
+});
+    
 
 describe('Market', function(){
     it('should be a function', function(){

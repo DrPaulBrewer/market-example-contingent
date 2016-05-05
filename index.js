@@ -61,7 +61,7 @@ var oa = function(oin){
     var i,l;
     if (typeof(oin)==='object'){
 	for(i=2,l=orderHeader.length;i<l;++i){
-	    a[i-2] = obj[orderHeader[i]];
+	    a[i-2] = oin[orderHeader[i]];
 	    if (!a[i-2]) a[i-2] = 0;
 	}
     }  
