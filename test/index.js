@@ -4,6 +4,7 @@ const marketExampleContingent = require('../index.js');
 const Market = marketExampleContingent.Market;
 const orderHeader = marketExampleContingent.orderHeader;
 const oa = marketExampleContingent.oa;
+const ao = marketExampleContingent.ao;
 const orders = require('./orders.js');
 
 function process(M,orders){
@@ -40,8 +41,33 @@ describe('oa', function(){
 	oa({q:3, buyPrice:100}).should.deepEqual([0,0,0,0,3,100,0,0,0,0,0,0,0,0,0,0,0]);
     });
 });
-    
 
+describe('ao', function(){
+    it('should be a function', function(){
+	ao.should.be.type('function');
+    });
+    it('ao(Array of length 17 [0,0,3,100,0,...,0]) should return obj.q==3, obj.buyPrice==100', function(){
+	var o = ao([0,0,0,0,3,100,0,0,0,0,0,0,0,0,0,0,0]);
+	o.q.should.equal(3);
+	o.buyPrice.should.equal(100);
+    });
+    it('ao(Array of length 19 [0,0,0,0,3,100,0,...,0]) should return obj.q==3, obj.buyPrice==100', function(){
+	var o = ao([0,0,0,0,0,0,3,100,0,0,0,0,0,0,0,0,0,0,0]);
+	o.q.should.equal(3);
+	o.buyPrice.should.equal(100);
+    });
+    it('ao(Array of length 18) should throw an error', function(){
+	var o18 = new Array(18).fill(1);
+	(function(){ ao(o18) }).should.throw();
+    });
+    it('ao() (missing parameter) should throw an error', function(){
+	ao.should.throw();
+    });
+    it('ao({}) (bad parameter) should throw an error', function(){
+	(function(){ ao({}) }).should.throw();
+    });
+});
+	
 describe('Market', function(){
     it('should be a function', function(){
 	Market.should.be.type('function');
@@ -148,8 +174,10 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
 		buyA: [3],
-		sellA: [2]		
+		sellA: [2]
 	    });
 	});
 	it('should remove filled orders from active list .a ', function(){
@@ -194,6 +222,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
 		buyA: [2],
 		sellA: [3]		
 	    });
@@ -268,6 +298,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
 		buyA: [0],
 		sellA: [2]		
 	    });
@@ -318,6 +350,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
 		buyA: [2],
 		sellA: [0]		
 	    });
@@ -377,6 +411,8 @@ describe('Market', function(){
 		prices: [120],
 		totalQ: 1,
 		buyQ: [1],
+		buyId: [1],
+		sellId: [2],
 		sellQ: [1],
 		buyA: [2],
 		sellA: [4]		
@@ -390,6 +426,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
 		buyA: [1],
 		sellA: [3]
 	    });
@@ -402,6 +440,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [3],
 		buyA: [0],
 		sellA: [1]		
 	    });
@@ -448,6 +488,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
 		buyA: [4],
 		sellA: [2]		
 	    });
@@ -460,6 +502,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
 		buyA: [3],
 		sellA: [0]
 	    });
@@ -472,6 +516,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [3],
+		sellId: [2],
 		buyA: [1],
 		sellA: [0]		
 	    });
@@ -525,6 +571,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
 		buyA: [301],
 		sellA: [304]		
 	    });
@@ -537,6 +585,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
 		buyA: [300],
 		sellA: [303]
 	    });
@@ -549,6 +599,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [3],
 		buyA: [0],
 		sellA: [300]		
 	    });
@@ -566,6 +618,8 @@ describe('Market', function(){
 		totalQ: 97,
 		buyQ: (new Array(97).fill(1)),
 		sellQ: [97],
+		buyId: (new Array(97).fill(1)),
+		sellId: [3],
 		buyA: myBuyA,
 		sellA: [299]
 	    });
@@ -582,6 +636,8 @@ describe('Market', function(){
 		totalQ: 100,
 		buyQ: (new Array(100).fill(1)),
 		sellQ: [100],
+		buyId: (new Array(100).fill(1)),
+		sellId: [3],
 		buyA: myBuyA,
 		sellA: [202]
 	    });
@@ -598,6 +654,8 @@ describe('Market', function(){
 		totalQ: 53,
 		buyQ: (new Array(53).fill(1)),
 		sellQ: [53],
+		buyId: (new Array(53).fill(1)),
+		sellId: [3],
 		buyA: myBuyA,
 		sellA: [102]
 	    });
@@ -656,6 +714,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
 		buyA: [301],
 		sellA: [304]		
 	    });
@@ -668,6 +728,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
 		buyA: [300],
 		sellA: [303]
 	    });
@@ -680,6 +742,8 @@ describe('Market', function(){
 		totalQ: 1,
 		buyQ: [1],
 		sellQ: [1],
+		buyId: [1],
+		sellId: [3],
 		buyA: [0],
 		sellA: [300]		
 	    });

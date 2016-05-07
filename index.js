@@ -56,6 +56,23 @@ var orderHeader = [
     'triggersSellStopPrice'
 ];
 
+var ao = function(oa){
+    var obj = {};
+    var i=0,l=orderHeader.length,offset=0;
+    if (oa.length===orderHeader.length){
+	offset=0;
+    } else if (oa.length===(orderHeader.length-2)){
+	offset=2;
+    } else {
+	throw new Error("market-example-contingen function ao(), expected order array to have length 17 or 19, got "+oa.length);
+    }
+    // always report orderHeader fields 0-6, afterward, report only nonzero fields
+    for(i=offset;i<l;++i)
+	if ((i<=6) || (oa[i-offset]))
+	    obj[orderHeader[i]] = oa[i-offset];
+    return obj;
+};
+
 var oa = function(oin){
     var a = [];
     var i,l;
@@ -108,25 +125,34 @@ var Market = function(options){
 	this.book.sell.syncLast();
 	this.book.buyStop.syncLast();
 	this.book.sellStop.syncLast();
-	var trades;
-	while ((trades = marketPricing.sequential(this.book.buy.idxdata(),
+	var seqtrades;
+	var tradeSpec;
+	var i,l;
+	while ((seqtrades = marketPricing.sequential(this.book.buy.idxdata(),
 						  this.book.sell.idxdata(),
 						  this.o.countCol,
 						  this.o.bpCol,
 						  this.o.qCol,
 						  this.o.spCol,
 						  this.o.qCol))!==undefined){
-	    // returns ['b'||'s', prices[], totalQ, buyQ[], sellQ[] ]
-	    this.trade({ 
-		t: ((trades[0]==='b')? (this.book.buy.idxdata(0)[this.o.tCol]): (this.book.sell.idxdata(0)[this.o.tCol])),
-		bs: trades[0],
-		prices: trades[1],
-		totalQ: trades[2],
-		buyQ: trades[3],
-		sellQ: trades[4],
-		buyA: this.book.buy.idx.slice(0,trades[3].length),
-		sellA: this.book.sell.idx.slice(0,trades[4].length)
-	    });
+	    // returns seqtrades = ['b'||'s', prices[], totalQ, buyQ[], sellQ[] ]	    
+	    tradeSpec = { 
+		t: ((seqtrades[0]==='b')? (this.book.buy.idxdata(0)[this.o.tCol]): (this.book.sell.idxdata(0)[this.o.tCol])),
+		bs: seqtrades[0],
+		prices: seqtrades[1],
+		totalQ: seqtrades[2],
+		buyQ: seqtrades[3],
+		sellQ: seqtrades[4],
+		buyA: this.book.buy.idx.slice(0,seqtrades[3].length),
+		sellA: this.book.sell.idx.slice(0,seqtrades[4].length)
+	    };
+	    tradeSpec.buyId  = [];
+	    tradeSpec.sellId = [];
+	    for(i=0,l=tradeSpec.buyA.length;i<l;++i)
+		tradeSpec.buyId[i] = this.a[tradeSpec.buyA[i]][this.o.idCol];
+	    for(i=0,l=tradeSpec.sellA.length;i<l;++i)
+		tradeSpec.sellId[i] = this.a[tradeSpec.sellA[i]][this.o.idCol];
+	    this.trade(tradeSpec);
 	}
     });
     this.on('trade', this.tradeTrigger);
@@ -306,6 +332,7 @@ Market.prototype.tradeLog = function(tradespec){
 
 module.exports.orderHeader = orderHeader;
 module.exports.oa = oa;
+module.exports.ao = ao;
 module.exports.Market = Market;
 
 
