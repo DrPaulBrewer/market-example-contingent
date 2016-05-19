@@ -12,7 +12,7 @@
   "dependencies": {
     "market-engine": "^0.1.1",
     "market-pricing": "^1.0.3",
-    "partial-index": "^1.5.3"
+    "partial-index": "^1.7.0"
   },
   "devDependencies": {
     "coveralls": "^2.11.6",
