@@ -7,10 +7,14 @@
     "test": "node_modules/.bin/mocha --reporter spec --slow 50 --timeout 2000",
     "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drpaulbrewer/market-example-contingent.git"
+  },
   "author": "drpaulbrewer@eaftc.com",
   "license": "MIT",
   "dependencies": {
-    "market-engine": "^0.1.1",
+    "market-engine": "^0.3.0",
     "market-pricing": "^1.0.3",
     "partial-index": "^1.7.0"
   },

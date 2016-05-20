@@ -86,6 +86,7 @@ var oa = function(oin){
 };
 
 
+
 var Market = function(options){
     // defaults defined standard this.o.tCol, etc. is authoritative for locating particular data in an order
     var defaults = { 
@@ -107,10 +108,11 @@ var Market = function(options){
 	trigSliceEnd:19
     };
     MarketEngine.call(this, Object.assign({}, defaults, options));
-    this.on('before-order', function(neworder){
+    this.on('before-order', function(neworder, reject){
 	var bpCol = this.o.bpCol, spCol=this.o.spCol, qCol=this.o.qCol, idCol = this.o.idCol, tCol = this.o.tCol;
 	var cancelCol = this.o.cancelCol;
 	var countRemoved = 0;
+	var improveIdx;
 	if (neworder[cancelCol]){
 	    countRemoved += this.cancel(neworder[idCol]);
 	}
@@ -119,48 +121,39 @@ var Market = function(options){
 	}
 	if (countRemoved)
 	    this.cleanup();
+	
+	// if buyImprove rule in effect, reject buy orders if buybook full and new order price not above price from book
+	if ( (this.o.buyImprove && neworder[bpCol]) &&
+	     (this.book.buy.idx) && (this.book.buy.idx.length === this.book.limit)
+	   ){
+	    improveIdx = this.o.buyImprove.level;
+	    if (improveIdx < 0)
+		improveIdx = this.book.buy.idx.length + improveIdx;
+	    if (neworder[bpCol] <= this.book.buy.val(improveIdx))
+		reject(neworder);
+	}
+	// if sellImprove rule in effect, reject sell orders if sellbook full and new order price not below price from book
+	if ( (this.o.sellImprove && neworder[spCol]) &&
+	     (this.book.sell.idx) && (this.book.sell.idx.length === this.book.limit) 
+	   ) {
+	    improveIdx = this.o.sellImprove.level;
+	    if (improveIdx < 0)
+		improveIdx = this.book.sell.idx.length + improveIdx;
+	    if (neworder[spCol] >= this.book.sell.val(improveIdx))
+		reject(neworder);
+	}
+	    
     });
     this.on('order', function(neworder){
 	this.book.buy.syncLast();
 	this.book.sell.syncLast();
 	this.book.buyStop.syncLast();
 	this.book.sellStop.syncLast();
-	var seqtrades;
-	var tradeSpec;
-	var i,l;
-	while ((seqtrades = marketPricing.sequential(this.book.buy.idxdata(),
-						  this.book.sell.idxdata(),
-						  this.o.countCol,
-						  this.o.bpCol,
-						  this.o.qCol,
-						  this.o.spCol,
-						  this.o.qCol))!==undefined){
-	    // returns seqtrades = ['b'||'s', prices[], totalQ, buyQ[], sellQ[] ]	    
-	    tradeSpec = { 
-		t: ((seqtrades[0]==='b')? (this.book.buy.idxdata(0)[this.o.tCol]): (this.book.sell.idxdata(0)[this.o.tCol])),
-		bs: seqtrades[0],
-		prices: seqtrades[1],
-		totalQ: seqtrades[2],
-		buyQ: seqtrades[3],
-		sellQ: seqtrades[4],
-		buyA: this.book.buy.idx.slice(0,seqtrades[3].length),
-		sellA: this.book.sell.idx.slice(0,seqtrades[4].length)
-	    };
-	    tradeSpec.buyId  = [];
-	    tradeSpec.sellId = [];
-	    for(i=0,l=tradeSpec.buyA.length;i<l;++i)
-		tradeSpec.buyId[i] = this.a[tradeSpec.buyA[i]][this.o.idCol];
-	    for(i=0,l=tradeSpec.sellA.length;i<l;++i)
-		tradeSpec.sellId[i] = this.a[tradeSpec.sellA[i]][this.o.idCol];
-	    this.trade(tradeSpec);
-	}
+	this.findAndProcessTrades();
     });
     this.on('trade', this.tradeTrigger);
     this.on('trade-cleanup', function(tradespec){
-	var matches;
-	while (Math.max.apply(Math,(matches = this.stopsMatch(tradespec)))>0){
-	    this.emit('stops', tradespec.t, matches);
-	}
+	this.findAndProcessStops(tradespec);
     });
     this.on('trade-cleanup', this.cleanup);
     this.on('stops', this.stopsTrigger);
@@ -169,6 +162,45 @@ var Market = function(options){
 
 
 util.inherits(Market, MarketEngine);
+
+Market.prototype.findAndProcessStops = function (tradespec){
+    var matches;
+    while (Math.max.apply(Math,(matches = this.stopsMatch(tradespec)))>0){
+	this.emit('stops', tradespec.t, matches);
+    }
+};
+
+Market.prototype.findAndProcessTrades = function(){
+    var seqtrades;
+    var tradeSpec;
+    var i,l;
+    while ((seqtrades = marketPricing.sequential(this.book.buy.idxdata(),
+						 this.book.sell.idxdata(),
+						 this.o.countCol,
+						 this.o.bpCol,
+						 this.o.qCol,
+						 this.o.spCol,
+						 this.o.qCol))!==undefined){
+	// returns seqtrades = ['b'||'s', prices[], totalQ, buyQ[], sellQ[] ]	    
+	tradeSpec = { 
+	    t: ((seqtrades[0]==='b')? (this.book.buy.idxdata(0)[this.o.tCol]): (this.book.sell.idxdata(0)[this.o.tCol])),
+	    bs: seqtrades[0],
+	    prices: seqtrades[1],
+	    totalQ: seqtrades[2],
+	    buyQ: seqtrades[3],
+	    sellQ: seqtrades[4],
+	    buyA: this.book.buy.idx.slice(0,seqtrades[3].length),
+	    sellA: this.book.sell.idx.slice(0,seqtrades[4].length)
+	};
+	tradeSpec.buyId  = [];
+	tradeSpec.sellId = [];
+	for(i=0,l=tradeSpec.buyA.length;i<l;++i)
+	    tradeSpec.buyId[i] = this.a[tradeSpec.buyA[i]][this.o.idCol];
+	for(i=0,l=tradeSpec.sellA.length;i<l;++i)
+	    tradeSpec.sellId[i] = this.a[tradeSpec.sellA[i]][this.o.idCol];
+	this.trade(tradeSpec);
+    }
+};
 
 Market.prototype.stopsMatch = function(tradespec){
     var prices = tradespec.prices;
@@ -276,6 +308,7 @@ Market.prototype.clear = function(){
     MarketEngine.prototype.clear.call(this);
     this.book = {};
     this.book.limit = this.o.booklimit || 100;
+    this.book.fixed = this.o.bookfixed;
     this.book.buy  = new PartialIndex(this.a,this.book.limit,this.o.bpCol,-1,this.o.countCol,1,this.o.qCol,1);
     this.book.sell = new PartialIndex(this.a,this.book.limit,this.o.spCol,1,this.o.countCol,1,this.o.qCol,1);
     this.book.buyStop =  new PartialIndex(this.a,this.book.limit,this.o.bsCol,1,this.o.countCol,1,this.o.qCol,1);
@@ -286,17 +319,17 @@ Market.prototype.clear = function(){
 
 Market.prototype.cleanup = function(){
     var blimit = this.book.limit;
+    var bfixed = this.book.fixed;
     var r = this.emptyTrash();
-    function bookRm(b){
-	if (r.length < 10){
+    this.books.forEach(function (b){
+	if ((!bfixed) && (r.length < 10)){
 	    b.remove(r, {shrink:1});
 	    if (b.limit < (blimit/2))
 		b.scan(blimit);
 	} else {
 	    b.scan(blimit);
 	}
-    }
-    this.books.forEach(bookRm);
+    });
 };
 
 
