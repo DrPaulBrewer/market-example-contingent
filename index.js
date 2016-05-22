@@ -173,7 +173,7 @@ var Market = function(options){
 		    keep[B.idx[i]] = 1;
 	    });
 	    var keepidx = Object.keys(keep).sort(function(a,b){ return +a-b; });
-	    var i,l,temp;
+	    var i,l,temp=[];
 	    for(i=0,l=keepidx.length;i<l;++i)
 		temp[i] = this.a[keepidx[i]];
 	    for(i=0,l=keepidx.length;i<l;++i)
