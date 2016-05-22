@@ -156,6 +156,30 @@ var Market = function(options){
 	this.findAndProcessStops(tradespec);
     });
     this.on('trade-cleanup', this.cleanup);
+    var buySellBookLimit = this.o.buySellBookLimit;
+    if (buySellBookLimit){
+	this.on('trade-cleanup', function(){
+	    var keep = {};
+	    [this.book.buy,this.book.sell].forEach(function(B){
+		var i,l;
+		for(i=0,l=Math.min(B.idx.length,buySellBookLimit);i<l;++i)
+		    keep[B.idx[i]] = 1;
+	    });
+	    [this.book.buyStop,this.book.sellStop].forEach(function(B){
+		var i,l;
+		for(i=0,l=B.idx.length;i<l;i++)
+		    keep[B.idx[i]] = 1;
+	    });
+	    var keepidx = Object.keys(keep).sort(function(a,b){ return +a-b; });
+	    var i,l,temp;
+	    for(i=0,l=keepidx.length;i<l;++i)
+		temp[i] = this.a[keepidx[i]];
+	    for(i=0,l=keepidx.length;i<l;++i)
+		this.a[i] = temp[i];
+	    this.a.length = l;
+	    this.book.forEach(function(B){ B.scan(); });
+	});
+    }
     this.on('stops', this.stopsTrigger);
     this.clear();
 };
