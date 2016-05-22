@@ -180,6 +180,12 @@ var Market = function(options){
 	    this.book.forEach(function(B){ B.scan(); });
 	});
     }
+    if (this.o.resetAfterEachTrade){
+	this.on('trade-cleanup', function(){
+	    this.a.length = 0;
+	    this.book.forEach(function(B){ B.scan(): });
+	});
+    }
     this.on('stops', this.stopsTrigger);
     this.clear();
 };
