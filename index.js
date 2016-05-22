@@ -179,13 +179,13 @@ var Market = function(options){
 	    for(i=0,l=keepidx.length;i<l;++i)
 		this.a[i] = temp[i];
 	    this.a.length = l;
-	    this.book.forEach(function(B){ B.scan(); });
+	    this.books.forEach(function(B){ B.scan(); });
 	});
     }
     if (this.o.resetAfterEachTrade){
 	this.on('trade-cleanup', function(){
 	    this.a.length = 0;
-	    this.book.forEach(function(B){ B.scan(); });
+	    this.books.forEach(function(B){ B.scan(); });
 	});
     }
     this.on('stops', this.stopsTrigger);
