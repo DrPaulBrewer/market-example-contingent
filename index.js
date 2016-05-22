@@ -113,15 +113,6 @@ var Market = function(options){
 	var cancelCol = this.o.cancelCol;
 	var countRemoved = 0;
 	var improveIdx;
-	if (neworder[cancelCol]){
-	    countRemoved += this.cancel(neworder[idCol]);
-	}
-	if (neworder[tCol]){
-	    countRemoved += this.expire(neworder[tCol]);
-	}
-	if (countRemoved)
-	    this.cleanup();
-	
 	// if buyImprove rule in effect, reject buy orders if buybook full and new order price not above price from book
 	if ( (this.o.buyImprove && neworder[bpCol]) &&
 	     (this.book.buy.idx) && (this.book.buy.idx.length === this.book.limit)
@@ -130,7 +121,7 @@ var Market = function(options){
 	    if (improveIdx < 0)
 		improveIdx = this.book.buy.idx.length + improveIdx;
 	    if (neworder[bpCol] <= this.book.buy.val(improveIdx))
-		reject(neworder);
+		return reject(neworder);
 	}
 	// if sellImprove rule in effect, reject sell orders if sellbook full and new order price not below price from book
 	if ( (this.o.sellImprove && neworder[spCol]) &&
@@ -140,9 +131,20 @@ var Market = function(options){
 	    if (improveIdx < 0)
 		improveIdx = this.book.sell.idx.length + improveIdx;
 	    if (neworder[spCol] >= this.book.sell.val(improveIdx))
-		reject(neworder);
+		return reject(neworder);
 	}
-	    
+
+	// if order not rejected by improvement rules, then handle cancellation and expiration of other orders
+
+	if (neworder[cancelCol]){
+	    countRemoved += this.cancel(neworder[idCol]);
+	}
+	if (neworder[tCol]){
+	    countRemoved += this.expire(neworder[tCol]);
+	}
+	if (countRemoved)
+	    this.cleanup();
+		    
     });
     this.on('order', function(neworder){
 	this.book.buy.syncLast();
