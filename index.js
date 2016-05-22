@@ -183,7 +183,7 @@ var Market = function(options){
     if (this.o.resetAfterEachTrade){
 	this.on('trade-cleanup', function(){
 	    this.a.length = 0;
-	    this.book.forEach(function(B){ B.scan(): });
+	    this.book.forEach(function(B){ B.scan(); });
 	});
     }
     this.on('stops', this.stopsTrigger);
