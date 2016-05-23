@@ -68,7 +68,7 @@ describe('ao', function(){
     });
 });
 	
-describe('Market', function(){
+describe('Market(options={})', function(){
     it('should be a function', function(){
 	Market.should.be.type('function');
     });
@@ -838,3 +838,104 @@ describe('Market', function(){
     }); 
     
 });
+
+describe('Market(options={bookfixed:1, booklimit:1, buyImprove:{level:0}})', function(){
+    describe('300 buy 1@100, 1@110,1@120, sell stop 1@112, sell stop 250@112 limit 112, sell 1@115, sell 1@105', function(){
+	var scenario=[];
+	var i,l;
+	for(i=0,l=300;i<l;++i)
+	    scenario.push(orders.id1_buy_1_at_100.slice());
+	scenario.push.apply(scenario, [
+	    orders.id1_buy_1_at_110,
+	    orders.id1_buy_1_at_120,
+	    orders.id3_sellstop_1_at_112,
+	    orders.id3_sellstop_250_at_112_limit_112,
+	    orders.id2_sell_1_at_115,
+	    orders.id2_sell_1_at_105
+	]);
+	var AM = new Market({bookfixed:1, booklimit:1, buyImprove:{level:0}});
+	var trades=[], stops = [];
+	AM.on('trade', function(tradespec){ trades.push(tradespec) });
+	AM.on('stops', function(t, matches){ stops.push(matches) });
+	process(AM, scenario);
+	it('should have empty inbox', function(){
+	    assert.equal(AM.inbox.length, 0);
+	});
+	it('should execute a stop-loss', function(){
+	    assert.ok(stops.length>0);
+	});
+	it('should generate two matches against stop books, each [0,1]', function(){
+	    /* because sell stop book here has limit 1 */
+	    stops.should.deepEqual([[0,1],[0,1]]);
+	});
+	it('should generate 3 trades', function(){
+	    // since booklimit===1 each match appears as a separate trade
+	    assert.equal(trades.length, 3);
+	});
+	it('should generate the correct first trade', function(){
+	    trades[0].should.deepEqual({
+		t: 0,
+		bs: 's',
+		prices: [120],
+		totalQ: 1,
+		buyQ: [1],
+		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
+		buyA: [2],
+		sellA: [5]		
+	    });
+	});
+	it('should generate the correct second trade', function(){
+	    trades[1].should.deepEqual({
+		t:0,
+		bs: 's',
+		prices: [110],
+		totalQ: 1,
+		buyQ: [1],
+		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
+		buyA: [1],
+		sellA: [4]
+	    });
+	});
+	it('should generate the correct third trade', function(){
+	    trades[2].should.deepEqual({
+		t:0,
+		bs: 's',
+		prices: [100],
+		totalQ: 1,
+		buyQ: [1],
+		sellQ: [1],
+		buyId: [1],
+		sellId: [3],
+		buyA: [0],
+		sellA: [1]		
+	    });
+	});
+	it('should have zero orders in buy book (exhausted as 299 1@100 buy orders were rejected early)', function(){
+	    assert.equal(AM.book.buy.idx.length, 0);
+	});
+	it('should have 1 order in .a', function(){
+	    assert.equal(AM.a.length, 1);
+	});
+	it('should have one order in sell book', function(){
+	    assert.ok(AM.book.sell.idx.length === 1);
+	});
+	it('should have first order in sell book be a limit sell order for 250 units at 112', function(){
+	    var sell1 = AM.book.sell.idxdata(0);
+	    var spCol = AM.o.spCol, ssCol = AM.o.ssCol, sspCol = AM.o.sspCol, qCol = AM.o.qCol;
+	    assert.equal(sell1[spCol], 112);
+	    assert.equal(sell1[ssCol], 0);
+	    assert.equal(sell1[sspCol], 0);
+	    assert.equal(sell1[qCol], 250);
+	});
+	it('should have empty buyStop and sellStop books', function(){
+	    assert.ok(AM.book.buyStop.idx.length === 0);
+	    assert.ok(AM.book.sellStop.idx.length === 0);
+	});
+    });
+
+});
+
