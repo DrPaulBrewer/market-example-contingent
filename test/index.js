@@ -839,7 +839,7 @@ describe('Market(options={})', function(){
     
 });
 
-describe('Market(options={bookfixed:1, booklimit:1, buyImprove:{level:0}})', function(){
+describe('Market(options={bookfixed:1, booklimit:5, buyImprove:{level:0}})', function(){
     describe('300 buy 1@100, 1@110,1@120, sell stop 1@112, sell stop 250@112 limit 112, sell 1@115, sell 1@105', function(){
 	var scenario=[];
 	var i,l;
@@ -853,7 +853,7 @@ describe('Market(options={bookfixed:1, booklimit:1, buyImprove:{level:0}})', fun
 	    orders.id2_sell_1_at_115,
 	    orders.id2_sell_1_at_105
 	]);
-	var AM = new Market({bookfixed:1, booklimit:1, buyImprove:{level:0}});
+	var AM = new Market({bookfixed:1, booklimit:5, buyImprove:{level:0}});
 	var trades=[], stops = [];
 	AM.on('trade', function(tradespec){ trades.push(tradespec) });
 	AM.on('stops', function(t, matches){ stops.push(matches) });
@@ -864,9 +864,9 @@ describe('Market(options={bookfixed:1, booklimit:1, buyImprove:{level:0}})', fun
 	it('should execute a stop-loss', function(){
 	    assert.ok(stops.length>0);
 	});
-	it('should generate two matches against stop books, each [0,1]', function(){
+	it('should generate two matches against stop books', function(){
 	    /* because sell stop book here has limit 1 */
-	    stops.should.deepEqual([[0,1],[0,1]]);
+	    stops.should.deepEqual([[0,2]]);
 	});
 	it('should generate 3 trades', function(){
 	    // since booklimit===1 each match appears as a separate trade
