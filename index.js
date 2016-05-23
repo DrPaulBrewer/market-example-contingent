@@ -56,20 +56,20 @@ var orderHeader = [
     'triggersSellStopPrice'
 ];
 
-var ao = function(oa){
+var ao = function(ordera){
     var obj = {};
     var i=0,l=orderHeader.length,offset=0;
-    if (oa.length===orderHeader.length){
+    if (ordera.length===orderHeader.length){
 	offset=0;
-    } else if (oa.length===(orderHeader.length-2)){
+    } else if (ordera.length===(orderHeader.length-2)){
 	offset=2;
     } else {
 	throw new Error("market-example-contingen function ao(), expected order array to have length 17 or 19, got "+oa.length);
     }
     // always report orderHeader fields 0-6, afterward, report only nonzero fields
     for(i=offset;i<l;++i)
-	if ((i<=6) || (oa[i-offset]))
-	    obj[orderHeader[i]] = oa[i-offset];
+	if ((i<=6) || (ordera[i-offset]))
+	    obj[orderHeader[i]] = ordera[i-offset];
     return obj;
 };
 
