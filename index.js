@@ -366,37 +366,6 @@ Market.prototype.cleanup = function(){
     });
 };
 
-
-Market.prototype.tradeLog = function(tradespec){
-    var idCol = this.o.idCol;
-    var outFunc = this.o.tradeLogWrite;
-    var i,l;
-    if (typeof(outFunc)!=='function') return;
-    if (tradespec.bs==='b'){
-	for(i=0,l=tradespec.sellA.length;i<l;++i)
-	    outFunc([
-		tradespec.bs,
-		tradespec.prices[i],
-		tradespec.sellQ[i],
-		this.a[tradespec.buyA[0]][idCol],
-		this.a[tradespec.sellA[i]][idCol],
-		"\n"
-	    ].join(","));
-    } else if (tradespec.bs==='s'){
-	for(i=0,l=tradespec.buyA.length;i<l;++i)
-	    outFunc([
-		tradespec.bs,
-		tradespec.prices[i],
-		tradespec.buyQ[i],
-		this.a[tradespec.buyA[i]][idCol],
-		this.a[tradespec.sellA[0]][idCol],
-		"\n"
-	    ].join(","));
-    }
-};
-
-
-
 module.exports.orderHeader = orderHeader;
 module.exports.oa = oa;
 module.exports.ao = ao;
