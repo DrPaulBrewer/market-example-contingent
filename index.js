@@ -113,9 +113,10 @@ var Market = function(options){
 	var cancelCol = this.o.cancelCol;
 	var countRemoved = 0;
 	var improveIdx;
-	// if buyImprove rule in effect, reject buy orders if buybook full and new order price not above price from book
+	// if buyImprove rule in effect, reject buy orders if new order price not above price from book
 	if ( (this.o.buyImprove && neworder[bpCol]) &&
-	     (this.book.buy.idx) && (this.book.buy.idx.length === this.book.limit)
+	     (this.book.buy.idx) && 
+	     (this.book.buy.idx.length > this.o.buyImprove.level)
 	   ){
 	    improveIdx = this.o.buyImprove.level;
 	    if (improveIdx < 0)
@@ -123,9 +124,10 @@ var Market = function(options){
 	    if (neworder[bpCol] <= this.book.buy.val(improveIdx))
 		return reject(neworder);
 	}
-	// if sellImprove rule in effect, reject sell orders if sellbook full and new order price not below price from book
+	// if sellImprove rule in effect, reject sell orders if new order price not below price from book
 	if ( (this.o.sellImprove && neworder[spCol]) &&
-	     (this.book.sell.idx) && (this.book.sell.idx.length === this.book.limit) 
+	     (this.book.sell.idx) && 
+	     (this.book.sell.idx.length > this.o.sellImprove.level) 
 	   ) {
 	    improveIdx = this.o.sellImprove.level;
 	    if (improveIdx < 0)
