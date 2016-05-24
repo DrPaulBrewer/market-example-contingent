@@ -957,7 +957,7 @@ describe('Market(options={bookfixed:1, booklimit:5, sellImprove:{level:0}})', fu
 	it('should have empty inbox', function(){
 	    assert.equal(AM.inbox.length, 0);
 	});
-	it('should generate 3 trades', function(){
+	it('should generate 2 trades', function(){
 	    assert.equal(trades.length, 2);
 	});
 	it('should generate the correct first trade', function(){
@@ -989,6 +989,66 @@ describe('Market(options={bookfixed:1, booklimit:5, sellImprove:{level:0}})', fu
 	    });
 	});
 	it('should have empty buy and sell books', function(){
+	    assert.ok(AM.book.buy.idx.length === 0);
+	    assert.ok(AM.book.sell.idx.length === 0);
+	});
+	it('should have empty buyStop and sellStop books', function(){
+	    assert.ok(AM.book.buyStop.idx.length === 0);
+	    assert.ok(AM.book.sellStop.idx.length === 0);
+	});
+    });
+
+});
+
+describe('Market(options={bookfixed:1, booklimit:5, buySellBookLimit:1 })', function(){
+    describe('sell 1@115, 1@125, 1@105, buy 1@110, 1@120 ', function(){
+	/* when buy 1@110 matches sell 1@105, the sell book becomes 1@115, as 1@125 is discarded */
+	var scenario = [
+	    orders.id2_sell_1_at_115,
+	    orders.id2_sell_1_at_125,
+	    orders.id2_sell_1_at_105,
+	    orders.id1_buy_1_at_110,
+	    orders.id1_buy_1_at_120,
+	];
+	var AM = new Market({bookfixed:1, booklimit:5, buySellBookLimit: 1});
+	var trades=[];
+	AM.on('trade', function(tradespec){ trades.push(tradespec) });
+	process(AM, scenario);
+	it('should have empty inbox', function(){
+	    assert.equal(AM.inbox.length, 0);
+	});
+	it('should generate 2 trades', function(){
+	    assert.equal(trades.length, 2);
+	});
+	it('should generate the correct first trade', function(){
+	    trades[0].should.deepEqual({
+		t: 0,
+		bs: 'b',
+		prices: [105],
+		totalQ: 1,
+		buyQ: [1],
+		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
+		buyA: [3],
+		sellA: [2]		
+	    });
+	});
+	it('should generate the correct second trade', function(){
+	    trades[1].should.deepEqual({
+		t:0,
+		bs: 'b',
+		prices: [115],
+		totalQ: 1,
+		buyQ: [1],
+		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
+		buyA: [1],
+		sellA: [0]
+	    });
+	});
+	it('should have empty buy and sell book', function(){
 	    assert.ok(AM.book.buy.idx.length === 0);
 	    assert.ok(AM.book.sell.idx.length === 0);
 	});
