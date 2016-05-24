@@ -112,16 +112,12 @@ var Market = function(options){
 	var bpCol = this.o.bpCol, spCol=this.o.spCol, qCol=this.o.qCol, idCol = this.o.idCol, tCol = this.o.tCol;
 	var cancelCol = this.o.cancelCol;
 	var countRemoved = 0;
-	var improveIdx;
 	// if buyImprove rule in effect, reject buy orders if new order price not above price from book
 	if ( (this.o.buyImprove && neworder[bpCol]) &&
 	     (this.book.buy.idx) && 
 	     (this.book.buy.idx.length > this.o.buyImprove.level)
 	   ){
-	    improveIdx = this.o.buyImprove.level;
-	    if (improveIdx < 0)
-		improveIdx = this.book.buy.idx.length + improveIdx;
-	    if (neworder[bpCol] <= this.book.buy.val(improveIdx))
+	    if (neworder[bpCol] <= this.book.buy.val(this.o.buyImprove.level))
 		return reject(neworder);
 	}
 	// if sellImprove rule in effect, reject sell orders if new order price not below price from book
@@ -129,13 +125,9 @@ var Market = function(options){
 	     (this.book.sell.idx) && 
 	     (this.book.sell.idx.length > this.o.sellImprove.level) 
 	   ) {
-	    improveIdx = this.o.sellImprove.level;
-	    if (improveIdx < 0)
-		improveIdx = this.book.sell.idx.length + improveIdx;
-	    if (neworder[spCol] >= this.book.sell.val(improveIdx))
+	    if (neworder[spCol] >= this.book.sell.val(this.o.sellImprove.level))
 		return reject(neworder);
 	}
-
 	// if order not rejected by improvement rules, then handle cancellation and expiration of other orders
 
 	if (neworder[cancelCol]){
