@@ -64,7 +64,7 @@ var ao = function(ordera){
     } else if (ordera.length===(orderHeader.length-2)){
 	offset=2;
     } else {
-	throw new Error("market-example-contingen function ao(), expected order array to have length 17 or 19, got "+oa.length);
+	throw new Error("market-example-contingent function ao(), expected order array to have length 17 or 19, got "+oa.length);
     }
     // always report orderHeader fields 0-6, afterward, report only nonzero fields
     for(i=offset;i<l;++i)
@@ -108,6 +108,8 @@ var Market = function(options){
 	trigSliceEnd:19
     };
     MarketEngine.call(this, Object.assign({}, defaults, options));
+    /* update books if orders are bumped off in a bump event */
+    this.on('bump', this.cleanup);
     this.on('before-order', function(neworder, reject){
 	var bpCol = this.o.bpCol, spCol=this.o.spCol, qCol=this.o.qCol, idCol = this.o.idCol, tCol = this.o.tCol;
 	var cancelCol = this.o.cancelCol;
@@ -128,17 +130,6 @@ var Market = function(options){
 	    if (neworder[spCol] >= this.book.sell.val(this.o.sellImprove.level))
 		return reject(neworder);
 	}
-	// if order not rejected by improvement rules, then handle cancellation and expiration of other orders
-
-	if (neworder[cancelCol]){
-	    countRemoved += this.cancel(neworder[idCol]);
-	}
-	if (neworder[tCol]){
-	    countRemoved += this.expire(neworder[tCol]);
-	}
-	if (countRemoved)
-	    this.cleanup();
-		    
     });
     this.on('order', function(neworder){
 	this.book.buy.syncLast();
