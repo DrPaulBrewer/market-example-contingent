@@ -1059,3 +1059,52 @@ describe('Market(options={bookfixed:1, booklimit:5, buySellBookLimit:1 })', func
     });
 
 });
+
+describe('Market(options={bookfixed:1, booklimit:5, resetAfterEachTrade:1 })', function(){
+    describe('sell 1@115, 1@125, 1@105, buy 1@110, 1@120 ', function(){
+	/* when buy 1@110 matches sell 1@105, the sell book empties, the buy 1@120 does not trade, gets put in .a */
+	var scenario = [
+	    orders.id2_sell_1_at_115,
+	    orders.id2_sell_1_at_125,
+	    orders.id2_sell_1_at_105,
+	    orders.id1_buy_1_at_110,
+	    orders.id1_buy_1_at_120,
+	];
+	var AM = new Market({bookfixed:1, booklimit:5, resetAfterEachTrade: 1});
+	var trades=[];
+	AM.on('trade', function(tradespec){ trades.push(tradespec) });
+	process(AM, scenario);
+	it('should have empty inbox', function(){
+	    assert.equal(AM.inbox.length, 0);
+	});
+	it('should generate 1 trade', function(){
+	    assert.equal(trades.length, 1);
+	});
+	it('should generate the correct first trade', function(){
+	    trades[0].should.deepEqual({
+		t: 0,
+		bs: 'b',
+		prices: [105],
+		totalQ: 1,
+		buyQ: [1],
+		sellQ: [1],
+		buyId: [1],
+		sellId: [2],
+		buyA: [3],
+		sellA: [2]		
+	    });
+	});
+	it('should have 1 buy 1@120 order in buy book', function(){
+	    assert.ok(AM.book.buy.idx.length === 1);
+	    assert.ok(AM.book.buy.val(0) === 120);
+	});
+	it('should have empty sell book', function(){
+	    assert.ok(AM.book.sell.idx.length === 0);
+	});
+	it('should have empty buyStop and sellStop books', function(){
+	    assert.ok(AM.book.buyStop.idx.length === 0);
+	    assert.ok(AM.book.sellStop.idx.length === 0);
+	});
+    });
+
+});
