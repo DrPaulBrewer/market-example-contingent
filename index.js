@@ -168,10 +168,7 @@ var Market = function(options){
 	});
     }
     if (this.o.resetAfterEachTrade){
-	this.on('trade-cleanup', function(){
-	    this.a.length = 0;
-	    this.books.forEach(function(B){ B.scan(); });
-	});
+	this.on('trade-cleanup', this.clear);
     }
     this.on('stops', this.stopsTrigger);
     this.clear();
