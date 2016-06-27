@@ -177,6 +177,21 @@ var Market = function(options){
 
 util.inherits(Market, MarketEngine);
 
+Market.prototype.currentBidPrice = function(){
+    /* relies on buy book sorted by price first because .val returns primary sort key */
+    return this.book.buy.val(0);
+};
+
+Market.prototype.currentAskPrice = function(){
+    /* relies on sell book sorted by price first because .val returns primary sort key */
+    return this.book.sell.val(0);
+};
+
+Market.prototype.lastTradePrice = function(){
+    if (this.lastTrade && this.lastTrade.prices && this.lastTrade.prices.length)
+	return this.lastTrade.prices[this.lastTrade.prices.length-1];
+};
+
 Market.prototype.findAndProcessStops = function (tradespec){
     var matches;
     while (Math.max.apply(Math,(matches = this.stopsMatch(tradespec)))>0){
@@ -213,6 +228,7 @@ Market.prototype.findAndProcessTrades = function(){
 	for(i=0,l=tradeSpec.sellA.length;i<l;++i)
 	    tradeSpec.sellId[i] = this.a[tradeSpec.sellA[i]][this.o.idCol];
 	this.trade(tradeSpec);
+	this.lastTrade = tradeSpec;
     }
 };
 

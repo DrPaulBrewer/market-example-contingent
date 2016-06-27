@@ -84,6 +84,9 @@ describe('Market(options={})', function(){
 	assert.ok(AM.books[1]===AM.book.sell);
 	assert.ok(AM.books[2]===AM.book.buyStop);
 	assert.ok(AM.books[3]===AM.book.sellStop);
+	assert.ok(AM.currentBidPrice()===undefined);
+	assert.ok(AM.currentAskPrice()===undefined);
+	assert.ok(AM.lastTradePrice()===undefined);
 	[AM.o.countCol,
 	 AM.o.tlocalCol,
 	 AM.o.tCol,
@@ -133,17 +136,36 @@ describe('Market(options={})', function(){
 	    orders.id2_sell_1_at_105,
 	    orders.id1_buy_1_at_100
 	]);
+
 	it('should not generate a trade', function(){
 	    assert.ok(trades.length===0);
 	});
+
+	it('should have .lastTradePrice() return undefined', function(){
+	    assert.ok(typeof(AM1.lastTradePrice())==='undefined');
+	    assert.ok(typeof(AM2.lastTradePrice())==='undefined');
+	});
+
 	it('should have correct buy book', function(){
 	    AM1.book.buy.idxdata().map(omit2).should.eql([orders.id1_buy_1_at_100]);
 	    AM2.book.buy.idxdata().map(omit2).should.eql([orders.id1_buy_1_at_100]);
 	});
+
+	it('should have correct currentBidPrice()', function(){
+	    AM1.currentBidPrice().should.equal(100);
+	    AM2.currentBidPrice().should.equal(100);
+	});
+
 	it('should have correct sell book', function(){
 	    AM1.book.sell.idxdata().map(omit2).should.eql([orders.id2_sell_1_at_105]);
 	    AM2.book.sell.idxdata().map(omit2).should.eql([orders.id2_sell_1_at_105]);
 	});
+
+	it('should have correct currentAskPrice()', function(){
+	    AM1.currentAskPrice().should.equal(105);
+	    AM2.currentAskPrice().should.equal(105);
+	});
+
 	it('should have empty stop books', function(){
 	    assert.ok(AM1.book.buyStop.idx.length===0);
 	    assert.ok(AM1.book.sellStop.idx.length===0);
@@ -180,6 +202,11 @@ describe('Market(options={})', function(){
 		sellA: [2]
 	    });
 	});
+
+	it('.lastTradePrice() should return 105', function(){
+	    AM.lastTradePrice().should.equal(105);
+	});
+
 	it('should remove filled orders from active list .a ', function(){
 	    assert.ok(AM.a.length===2);
 	});
@@ -188,11 +215,21 @@ describe('Market(options={})', function(){
 	    assert.ok(AM.book.buy.idx[0]===1);
 	    omit2(AM.a[1]).should.deepEqual(orders.id1_buy_1_at_100);
 	});
+
+	it('.currentBidPrice() should return 100', function(){
+	    AM.currentBidPrice().should.equal(100);
+	});
+
 	it('should have correct post-trade sell book', function(){
 	    assert.ok(AM.book.sell.idx.length===1);
 	    assert.ok(AM.book.sell.idx[0]===0);
 	    omit2(AM.a[0]).should.deepEqual(orders.id2_sell_1_at_125);
 	});
+	
+	it('.currentAskPrice() should return 125', function(){
+	    AM.currentAskPrice().should.equal(125);
+	});
+
 	it('should have empty stop books', function(){
 	    assert.ok(AM.book.buyStop.idx.length===0);
 	    assert.ok(AM.book.sellStop.idx.length===0);
@@ -228,6 +265,11 @@ describe('Market(options={})', function(){
 		sellA: [3]		
 	    });
 	});
+
+	it('.lastTradePrice() should return 120', function(){
+	    AM.lastTradePrice().should.equal(120);
+	});
+
 	it('should remove filled orders from active list .a ', function(){
 	    assert.ok(AM.a.length===2);
 	});
@@ -236,11 +278,21 @@ describe('Market(options={})', function(){
 	    assert.ok(AM.book.buy.idx[0]===1);
 	    omit2(AM.a[1]).should.deepEqual(orders.id1_buy_1_at_110);
 	});
+	
+	it('.currentBidPrice() should return 110', function(){
+	    AM.currentBidPrice().should.equal(110);
+	});
+
 	it('should have correct post-trade sell book', function(){
 	    assert.ok(AM.book.sell.idx.length===1);
 	    assert.ok(AM.book.sell.idx[0]===0);
 	    omit2(AM.a[0]).should.deepEqual(orders.id2_sell_1_at_125);
 	});
+
+	it('.currentAskPrice() should return 125', function(){
+	    AM.currentAskPrice().should.equal(125);
+	});
+
 	it('should have empty stop books', function(){
 	    assert.ok(AM.book.buyStop.idx.length===0);
 	    assert.ok(AM.book.sellStop.idx.length===0);
@@ -260,13 +312,22 @@ describe('Market(options={})', function(){
 	it('should not generate a trade', function(){
 	    assert.ok(trades.length===0);
 	});
+	it('.lastTradePrice() should return undefined', function(){
+	    assert.ok(typeof(AM.lastTradePrice())==='undefined');
+	});
 	it('should have buy book with 1 item', function(){
 	    assert.ok(AM.book.buy.idx.length === 1);
+	});
+	it('.currentBidPrice() should return 120', function(){
+	    AM.currentBidPrice().should.equal(120);
 	});
 	it('should have empty sell book', function(){
 	    assert.ok(AM.book.sell.idx.length === 0);
 	});
-	it('should have emoty buyStop book', function(){
+	it('.currentAskPrice() should return undefined', function(){
+	    assert.ok(typeof(AM.currentAskPrice())==='undefined');
+	});
+	it('should have empty buyStop book', function(){
 	    assert.ok(AM.book.buyStop.idx.length === 0);
 	});
 	it('should have sellStop book with unexecuted order', function(){
@@ -304,9 +365,16 @@ describe('Market(options={})', function(){
 		sellA: [2]		
 	    });
 	});
+	it('.lastTradePrice() should return 120', function(){
+	    AM.lastTradePrice().should.equal(120);
+	});
 	it('should have empty buy and sell books', function(){
 	    assert.ok(AM.book.buy.idx.length === 0);
 	    assert.ok(AM.book.sell.idx.length === 0);
+	});
+	it('.currentBidPrice() and .currentAskPrice should return undefined', function(){
+	    assert.ok(typeof(AM.currentBidPrice())==='undefined');
+	    assert.ok(typeof(AM.currentAskPrice())==='undefined');
 	});
 	it('should have sellStop book with unexecuted order', function(){
 	    assert.ok(AM.book.sellStop.idx.length === 1);
@@ -356,9 +424,16 @@ describe('Market(options={})', function(){
 		sellA: [0]		
 	    });
 	});
+	it('.lastTradePrice() should return 105', function(){
+	    AM.lastTradePrice().should.equal(105);
+	});
 	it('should have empty buy and sell books', function(){
 	    assert.ok(AM.book.buy.idx.length === 0);
 	    assert.ok(AM.book.sell.idx.length === 0);
+	});
+	it('.currentBidPrice() and .currentAskPrice() should return undefined', function(){
+	    assert.ok(typeof(AM.currentBidPrice())==='undefined');
+	    assert.ok(typeof(AM.currentAskPrice())==='undefined');
 	});
 	it('should have buyStop book with unexecuted order', function(){
 	    assert.ok(AM.book.buyStop.idx.length === 1);
@@ -446,9 +521,16 @@ describe('Market(options={})', function(){
 		sellA: [1]		
 	    });
 	});
+	it('.lastTradePrice() should return 100', function(){
+	    AM.lastTradePrice().should.equal(100);
+	});
 	it('should have empty buy and sell books', function(){
 	    assert.ok(AM.book.buy.idx.length === 0);
 	    assert.ok(AM.book.sell.idx.length === 0);
+	});
+	it('.currentBidPrice() and .currentAskPrice() should return undefined', function(){
+	    assert.ok(typeof(AM.currentBidPrice())==='undefined');
+	    assert.ok(typeof(AM.currentAskPrice())==='undefined');
 	});
 	it('should have empty buyStop and sellStop books', function(){
 	    assert.ok(AM.book.buyStop.idx.length === 0);
@@ -522,9 +604,16 @@ describe('Market(options={})', function(){
 		sellA: [0]		
 	    });
 	});
+	it('.lastTradePrice() should return 125', function(){
+	    AM.lastTradePrice().should.equal(125);
+	});
 	it('should have empty buy and sell books', function(){
 	    assert.ok(AM.book.buy.idx.length === 0);
 	    assert.ok(AM.book.sell.idx.length === 0);
+	});
+	it('.currentBidPrice() and .currentAskPrice() should return undefined', function(){
+	    assert.ok(typeof(AM.currentBidPrice())==='undefined');
+	    assert.ok(typeof(AM.currentAskPrice())==='undefined');
 	});
 	it('should have empty buyStop and sellStop books', function(){
 	    assert.ok(AM.book.buyStop.idx.length === 0);
@@ -660,14 +749,23 @@ describe('Market(options={})', function(){
 		sellA: [102]
 	    });
 	});
+	it('.lastTradePrice() should return 100', function(){
+	    AM.lastTradePrice().should.equal(100);
+	});
 	it('should have 49 orders in buy book', function(){
 	    assert.equal(AM.book.buy.idx.length, 49);
 	});
-	it('shiuld hvae 49 orders in .a', function(){
+	it('.currentBidPrice() should return 100', function(){
+	    AM.currentBidPrice().should.equal(100);
+	});
+	it('should have 49 orders in .a', function(){
 	    assert.equal(AM.a.length, 49);
 	});
 	it('should have empty sell book', function(){
 	    assert.ok(AM.book.sell.idx.length === 0);
+	});
+	it('.currentAskPrice() should return undefined', function(){
+	    assert.ok(typeof(AM.currentAskPrice())==='undefined');
 	});
 	it('should have empty buyStop and sellStop books', function(){
 	    assert.ok(AM.book.buyStop.idx.length === 0);
@@ -748,10 +846,16 @@ describe('Market(options={})', function(){
 		sellA: [300]		
 	    });
 	});
+	it('.lastTradePrice() should return 100', function(){
+	    AM.lastTradePrice().should.equal(100);
+	});
 	it('should have 97 orders in buy book', function(){
 	    assert.equal(AM.book.buy.idx.length, 97);
 	});
-	it('shiuld hvae 300 orders in .a', function(){
+	it('.currentBidPrice() should return 100', function(){
+	    AM.currentBidPrice().should.equal(100);
+	});
+	it('should have 300 orders in .a', function(){
 	    assert.equal(AM.a.length, 300);
 	});
 	it('should have one order in sell book', function(){
@@ -764,6 +868,9 @@ describe('Market(options={})', function(){
 	    assert.equal(sell1[ssCol], 0);
 	    assert.equal(sell1[sspCol], 0);
 	    assert.equal(sell1[qCol], 250);
+	});
+	it('should have .currentAskPrice() return 112', function(){
+	    AM.currentAskPrice().should.equal(112);
 	});
 	it('should have empty buyStop and sellStop books', function(){
 	    assert.ok(AM.book.buyStop.idx.length === 0);
@@ -796,12 +903,21 @@ describe('Market(options={})', function(){
 	    assert.equal(trades[0].prices[0], 95);
 	    assert.equal(trades[1].prices[0], 105);
 	});
+	it('.lastTradePrice() should return 105', function(){
+	    AM.lastTradePrice().should.equal(105);
+	});
 	it('should have empty buy book', function(){
 	    assert.ok(AM.book.buy.idx.length === 0);
+	});
+	it('.currentBidPrice() should return undefined', function(){
+	    assert.ok(typeof(AM.currentBidPrice())==='undefined');
 	});
 	it('should have sell book with one order at 115', function(){
 	    assert.ok(AM.book.sell.idx.length === 1);
 	    assert.ok(AM.book.sell.val(0) === 115);
+	});
+	it('.currentAskPrice() should return 115', function(){
+	    AM.currentAskPrice().should.equal(115);
 	});
     });
 
@@ -826,11 +942,20 @@ describe('Market(options={})', function(){
 	it('should generate 1 trade', function(){
 	    assert.equal(trades.length, 1);
 	});
+	it('.lastTradePrice() should return 95', function(){
+	    AM.lastTradePrice().should.equal(95);
+	});
 	it('should have empty buy book', function(){
 	    assert.equal(AM.book.buy.idx.length, 0);
 	});
+	it('.currentBidPrice() should return undefined', function(){
+	    assert.ok(typeof(AM.currentBidPrice())==='undefined');
+	});
 	it('should have 3 orders in sell book', function(){
 	    assert.equal(AM.book.sell.idx.length, 3);
+	});
+	it('.currentAskPrice()  should return 105', function(){
+	   AM.currentAskPrice().should.equal(105);
 	});
 	it('should have 120 OCO stoplimit 100 as last sell book order', function(){
 	    omit2(AM.book.sell.idxdata(2)).should.deepEqual(orders.id4_sell_1_at_120_OCO_100);
@@ -914,8 +1039,14 @@ describe('Market(options={bookfixed:1, booklimit:5, buyImprove:{level:0}})', fun
 		sellA: [1]		
 	    });
 	});
+	it('.lastTradePrice() should return 100', function(){
+	    AM.lastTradePrice().should.equal(100);
+	});
 	it('should have zero orders in buy book (exhausted as 299 1@100 buy orders were rejected early)', function(){
 	    assert.equal(AM.book.buy.idx.length, 0);
+	});
+	it('.currentBidPrice() should return undefined', function(){
+	    assert.ok(typeof(AM.currentBidPrice())==='undefined');
 	});
 	it('should have 1 order in .a', function(){
 	    assert.equal(AM.a.length, 1);
@@ -930,6 +1061,9 @@ describe('Market(options={bookfixed:1, booklimit:5, buyImprove:{level:0}})', fun
 	    assert.equal(sell1[ssCol], 0);
 	    assert.equal(sell1[sspCol], 0);
 	    assert.equal(sell1[qCol], 250);
+	});
+	it('.currentAskPrice() should return 112', function(){
+	    AM.currentAskPrice().should.equal(112);
 	});
 	it('should have empty buyStop and sellStop books', function(){
 	    assert.ok(AM.book.buyStop.idx.length === 0);
@@ -988,6 +1122,10 @@ describe('Market(options={bookfixed:1, booklimit:5, sellImprove:{level:0}})', fu
 		sellA: [0]
 	    });
 	});
+	it('.lastTradePrice should return 115', function(){
+	    AM.lastTradePrice().should.equal(115);
+	});
+	
 	it('should have empty buy and sell books', function(){
 	    assert.ok(AM.book.buy.idx.length === 0);
 	    assert.ok(AM.book.sell.idx.length === 0);
@@ -1048,6 +1186,9 @@ describe('Market(options={bookfixed:1, booklimit:5, buySellBookLimit:1 })', func
 		sellA: [0]
 	    });
 	});
+	it('.lastTradePrice() should return 115', function(){
+	    AM.lastTradePrice().should.equal(115);
+	});
 	it('should have empty buy and sell book', function(){
 	    assert.ok(AM.book.buy.idx.length === 0);
 	    assert.ok(AM.book.sell.idx.length === 0);
@@ -1094,12 +1235,21 @@ describe('Market(options={bookfixed:1, booklimit:5, resetAfterEachTrade:1 })', f
 		sellA: [2]		
 	    });
 	});
+	it('.lastTradePrice() should return 105', function(){
+	    AM.lastTradePrice().should.equal(105);
+	});
 	it('should have 1 buy 1@120 order in buy book', function(){
 	    assert.ok(AM.book.buy.idx.length === 1);
 	    assert.ok(AM.book.buy.val(0) === 120);
 	});
+	it('.currentBidPrice() should return 120', function(){
+	    AM.currentBidPrice().should.equal(120);
+	});
 	it('should have empty sell book', function(){
 	    assert.ok(AM.book.sell.idx.length === 0);
+	});
+	it('.currentAskPrice() should return undefined', function(){
+	    assert.ok(typeof(AM.currentAskPrice())==='undefined');
 	});
 	it('should have empty buyStop and sellStop books', function(){
 	    assert.ok(AM.book.buyStop.idx.length === 0);
@@ -1154,6 +1304,9 @@ describe('Market(options={bookfixed:1, booklimit:5, resetAfterEachTrade:1 })', f
 		buyA: [0],
 		sellA: [1]
 	    });
+	});
+	it('.lastTradePrice() should return 120', function(){
+	    AM.lastTradePrice().should.equal(120);
 	});
 	it('should have empty buy and sell books', function(){
 	    assert.ok(AM.book.buy.idx.length === 0);
