@@ -1,6 +1,6 @@
 {
   "name": "market-example-contingent",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "provides exchange Market with time-based and cancellable limit orders, and contingent orders such as stop, OSO (one-sends-others) and OCO (one-cancels-others) ",
   "main": "index.js",
   "scripts": {
