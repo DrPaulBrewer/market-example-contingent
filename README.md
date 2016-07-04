@@ -1,6 +1,5 @@
 market-example-contingent
 ===
-
 [![Build Status](https://travis-ci.org/DrPaulBrewer/market-example-contingent.svg?branch=master)](https://travis-ci.org/DrPaulBrewer/market-example-contingent)
 [![Coverage Status](https://coveralls.io/repos/github/DrPaulBrewer/market-example-contingent/badge.svg?branch=master)](https://coveralls.io/github/DrPaulBrewer/market-example-contingent?branch=master)
 

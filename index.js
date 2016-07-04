@@ -117,17 +117,17 @@ var Market = function(options){
 	// if buyImprove rule in effect, reject buy orders if new order price not above price from book
 	if ( (this.o.buyImprove && neworder[bpCol]) &&
 	     (this.book.buy.idx) && 
-	     (this.book.buy.idx.length > this.o.buyImprove.level)
+	     (this.book.buy.idx.length >= this.o.buyImprove)
 	   ){
-	    if (neworder[bpCol] <= this.book.buy.val(this.o.buyImprove.level))
+	    if (neworder[bpCol] <= this.book.buy.val(this.o.buyImprove-1))
 		return reject(neworder);
 	}
 	// if sellImprove rule in effect, reject sell orders if new order price not below price from book
 	if ( (this.o.sellImprove && neworder[spCol]) &&
 	     (this.book.sell.idx) && 
-	     (this.book.sell.idx.length > this.o.sellImprove.level) 
+	     (this.book.sell.idx.length >= this.o.sellImprove) 
 	   ) {
-	    if (neworder[spCol] >= this.book.sell.val(this.o.sellImprove.level))
+	    if (neworder[spCol] >= this.book.sell.val(this.o.sellImprove-1))
 		return reject(neworder);
 	}
     });

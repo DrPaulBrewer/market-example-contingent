@@ -964,7 +964,7 @@ describe('Market(options={})', function(){
     
 });
 
-describe('Market(options={bookfixed:1, booklimit:5, buyImprove:{level:0}})', function(){
+describe('Market(options={bookfixed:1, booklimit:5, buyImprove:1})', function(){
     describe('300 buy 1@100, 1@110,1@120, sell stop 1@112, sell stop 250@112 limit 112, sell 1@115, sell 1@105', function(){
 	var scenario=[];
 	var i,l;
@@ -978,7 +978,7 @@ describe('Market(options={bookfixed:1, booklimit:5, buyImprove:{level:0}})', fun
 	    orders.id2_sell_1_at_115,
 	    orders.id2_sell_1_at_105
 	]);
-	var AM = new Market({bookfixed:1, booklimit:5, buyImprove:{level:0}});
+	var AM = new Market({bookfixed:1, booklimit:5, buyImprove:1});
 	var trades=[], stops = [];
 	AM.on('trade', function(tradespec){ trades.push(tradespec) });
 	AM.on('stops', function(t, matches){ stops.push(matches) });
@@ -1074,7 +1074,7 @@ describe('Market(options={bookfixed:1, booklimit:5, buyImprove:{level:0}})', fun
 });
 
 
-describe('Market(options={bookfixed:1, booklimit:5, sellImprove:{level:0}})', function(){
+describe('Market(options={bookfixed:1, booklimit:5, sellImprove:1})', function(){
     describe('sell 1@115, 1@125, 1@105, buy 1@110, 1@120 ', function(){
 	var scenario = [
 	    orders.id2_sell_1_at_115,
@@ -1084,7 +1084,7 @@ describe('Market(options={bookfixed:1, booklimit:5, sellImprove:{level:0}})', fu
 	    orders.id1_buy_1_at_120,
 	];
 	/* note that the sell 1 @ 125 is rejected by sellImprove rule */
-	var AM = new Market({bookfixed:1, booklimit:5, sellImprove:{level:0}});
+	var AM = new Market({bookfixed:1, booklimit:5, sellImprove:1});
 	var trades=[];
 	AM.on('trade', function(tradespec){ trades.push(tradespec) });
 	process(AM, scenario);
@@ -1135,7 +1135,6 @@ describe('Market(options={bookfixed:1, booklimit:5, sellImprove:{level:0}})', fu
 	    assert.ok(AM.book.sellStop.idx.length === 0);
 	});
     });
-
 });
 
 describe('Market(options={bookfixed:1, booklimit:5, buySellBookLimit:1 })', function(){
