@@ -123,7 +123,7 @@ decremented by the traded quantity and a `trade(tradespec)` event is fired. Othe
 accounting, log trades, or update displays may wish to set a `.on('trade', function(){...})` listener for event `trade`. 
 
 After processing and emitting a trade, if any order in the trade has trigger fields, a new order is pushed to the
-input, transforming the trigger fields to regular order fields and using the old order's quantity traded (not quantity
+inbox, transforming the trigger fields to regular order fields and using the old order's quantity traded (not quantity
 ordered) as the new quantity.  After creating orders from triggers, stop/stop-limit orders are checked and, if the
 stop loss criterion is met, converted into new limit orders.
 
