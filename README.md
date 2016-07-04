@@ -16,7 +16,7 @@ Built using market-engine, market-pricing, and partial-index packages also poste
 ##Initialization
 
     const MEC = require('market-example-contingent');
-    var XMarket = new MEC.Market({});
+    var XMarket = new MEC.Market({money:'coins', goods:'X'});
 
 ##Provides
 * `new MEC.Market(config)` constructor function for Market.  
