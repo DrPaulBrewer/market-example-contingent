@@ -43,7 +43,8 @@ as well as `.on('someEvent', function(params){ ... })` and `.emit('someEvent')` 
 
 ##Isomorphic Javascript
 
-This code will run either on nodejs 4.4.7 and can be bundled via [browserify](https://github.com/substack/node-browserify) for most modern browsers that support ES6.
+This code will run either on nodejs 4.4.7 and can be bundled via [browserify](https://github.com/substack/node-browserify)
+for most modern browsers. n The code is currently written in an ES5 style with `const` used sparingly, mostly with `require`.
 
 #Usage
 
