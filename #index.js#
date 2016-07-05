@@ -85,29 +85,30 @@ function oa(oin){
     return a;   
 }
 
-var Market = function(options){
-    // defaults defined standard this.o.tCol, etc. is authoritative for locating particular data in an order
-    var defaults = { 
-        pushArray:1,
-        countCol:0,
-        tlocalCol:1,
-        tCol:2,
-        txCol:3,
-        idCol:4,
-        cancelCol:5,
-        qCol:6,
-        bpCol:7,
-        spCol:8,
-        bsCol:9,
-        bspCol:10,
-        ssCol:11,
-        sspCol:12,
-        trigSliceBegin:13,
-        trigSliceEnd:19
-    };
-    MarketEngine.call(this, Object.assign({}, defaults, options));
-    /* update books if orders are bumped off in a bump event */
-    this.on('bump', this.cleanup);
+class Market extends MarketEngine {
+	constructor(options){
+	    // defaults defined standard this.o.tCol, etc. is authoritative for locating particular data in an order
+	    const defaults = { 
+		pushArray:1,
+		countCol:0,
+		tlocalCol:1,
+		tCol:2,
+		txCol:3,
+		idCol:4,
+		cancelCol:5,
+		qCol:6,
+		bpCol:7,
+		spCol:8,
+		bsCol:9,
+		bspCol:10,
+		ssCol:11,
+		sspCol:12,
+		trigSliceBegin:13,
+		trigSliceEnd:19
+	    };
+	    MarketEngine.call(this, Object.assign({}, defaults, options));
+	    this.on('bump', this.cleanup); 	    // update books if orders are bumped off in a bump even
+
     this.on('before-order', function(neworder, reject){
         var bpCol = this.o.bpCol, spCol=this.o.spCol, qCol=this.o.qCol, idCol = this.o.idCol, tCol = this.o.tCol;
         var cancelCol = this.o.cancelCol;
