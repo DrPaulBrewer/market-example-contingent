@@ -2,7 +2,7 @@
   "name": "market-example-contingent",
   "version": "0.13.3",
   "description": "provides exchange Market with time-based and cancellable limit orders, and contingent orders such as stop, OSO (one-sends-others) and OCO (one-cancels-others) ",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "node_modules/.bin/mocha --reporter spec --slow 50 --timeout 2000",
     "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*"
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "coveralls": "^2.11.6",
+    "eslint": "^3.0.1",
     "istanbul": "^0.4.2",
     "mocha": "^2.4.5",
     "should": "^8.2.2"

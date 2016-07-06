@@ -43,8 +43,9 @@ as well as `.on('someEvent', function(params){ ... })` and `.emit('someEvent')` 
 
 ##Isomorphic Javascript
 
-This code will run either on nodejs 4.4.7 and can be bundled via [browserify](https://github.com/substack/node-browserify)
-for most modern browsers. n The code is currently written in an ES5 style with `const` used sparingly, mostly with `require`.
+This code will run either on nodejs 6 or on the latest Chrome, FF, and Edge browsers, and can be bundled via [browserify](https://github.com/substack/node-browserify)
+for most modern browsers. n The code is currently written in ES6 style with commonJS require() instead of ES6 modules. There is
+no transpilation step.  Developers are free to use an appropriate transpiler/loader stack if they wish.
 
 #Usage
 
@@ -70,6 +71,9 @@ Introduction goes here.
     XMarket.on('before-order', function(myorder){
            // something to do on every order before it is processed
     });
+
+The use of arrow functions for event handlers is discouraged.  The market's base class is `EventEmitter` and sets `this` to point at the market instance
+when a standard `function` is passed.  
 
 See also the MarketEngine documentation in package `market-engine`, as the market object inherits from MarketEngine.
 
