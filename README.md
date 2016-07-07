@@ -45,7 +45,7 @@ as well as `.on('someEvent', function(params){ ... })` and `.emit('someEvent')` 
 
 This code will run either on nodejs 6 or on the latest Chrome, FF, and Edge browsers, and can be bundled via [browserify](https://github.com/substack/node-browserify)
 for most modern browsers. n The code is currently written in ES6 style with commonJS require() instead of ES6 modules. There is
-no transpilation step.  Developers are free to use an appropriate transpiler/loader stack if they wish.
+no transpilation step.  Developers are free to use an appropriate transpiler/loader stack if they wish.  
 
 #Usage
 
