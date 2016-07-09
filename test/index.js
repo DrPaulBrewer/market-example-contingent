@@ -1,12 +1,11 @@
 /* eslint-env node, mocha */
-const assert = require('assert');
-require('should');
-const marketExampleContingent = require('../src/index.js');
-const Market = marketExampleContingent.Market;
-const orderHeader = marketExampleContingent.orderHeader;
-const oa = marketExampleContingent.oa;
-const ao = marketExampleContingent.ao;
-const orders = require('./orders.js');
+
+import assert from 'assert';
+import 'should';
+import * as marketExampleContingent from '../src/index.js';
+import * as orders from './orders.js';
+
+const {Market, orderHeader, oa, ao} = marketExampleContingent;
 
 function process(M, orderList){
    orderList.forEach(function(myorder){

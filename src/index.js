@@ -3,8 +3,6 @@
 // see https://opensource.org/licenses/MIT or included License.md file
 
 
-/* jshint node:true,esnext:true,eqeqeq:true,undef:true,lastsemic:true */
-
 // order format
 // order = [
 // 0      counter: // strictly increasing, may have gaps
@@ -29,9 +27,9 @@
 // ]
 
 
-const MarketEngine = require('market-engine');
-const marketPricing = require('market-pricing');
-const PartialIndex = require('partial-index');
+import {MarketEngine} from 'market-engine';
+import marketPricing from 'market-pricing';
+import PartialIndex from 'partial-index';
 
 // orderHeader is defined for ease of writing a header line for orders to a CSV file or a table heading
 const orderHeader = [
