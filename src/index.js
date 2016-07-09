@@ -32,7 +32,7 @@ import marketPricing from 'market-pricing';
 import PartialIndex from 'partial-index';
 
 // orderHeader is defined for ease of writing a header line for orders to a CSV file or a table heading
-const orderHeader = [
+export const orderHeader = [
     'count',
     'tlocal',
     't',
@@ -54,7 +54,7 @@ const orderHeader = [
     'triggersSellStopPrice'
 ];
 
-function ao(ordera){
+export function ao(ordera){
     const obj = {};
     let i=0,l=orderHeader.length,offset=0;
     if (ordera.length===orderHeader.length){
@@ -71,7 +71,7 @@ function ao(ordera){
     return obj;
 }
 
-function oa(oin){
+export function oa(oin){
     const a = [];
     let i,l;
     if (typeof(oin)==='object'){
@@ -83,7 +83,7 @@ function oa(oin){
     return a;   
 }
 
-class Market extends MarketEngine {
+export class Market extends MarketEngine {
     constructor(options){
         // defaults defined standard this.o.tCol, etc. is authoritative for locating particular data in an order
         const defaults = { 
@@ -362,10 +362,3 @@ class Market extends MarketEngine {
         });
     }
 }
-
-module.exports.orderHeader = orderHeader;
-module.exports.oa = oa;
-module.exports.ao = ao;
-module.exports.Market = Market;
-
-

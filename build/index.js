@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Market = exports.orderHeader = undefined;
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
@@ -31,6 +36,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 // 18     trigssp: // limit price if triggered sell stop is activated
 // ]
 
+exports.ao = ao;
+exports.oa = oa;
+
 var _marketEngine = require('market-engine');
 
 var _marketPricing = require('market-pricing');
@@ -52,7 +60,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // orderHeader is defined for ease of writing a header line for orders to a CSV file or a table heading
-var orderHeader = ['count', 'tlocal', 't', 'tx', 'id', 'cancel', 'q', 'buyPrice', 'sellPrice', 'buyStop', 'buyStopPrice', 'sellStop', 'sellStopPrice', 'triggersBuyPrice', 'triggersSellPrice', 'triggersBuyStop', 'triggersBuyStopPrice', 'triggersSellStop', 'triggersSellStopPrice'];
+var orderHeader = exports.orderHeader = ['count', 'tlocal', 't', 'tx', 'id', 'cancel', 'q', 'buyPrice', 'sellPrice', 'buyStop', 'buyStopPrice', 'sellStop', 'sellStopPrice', 'triggersBuyPrice', 'triggersSellPrice', 'triggersBuyStop', 'triggersBuyStopPrice', 'triggersSellStop', 'triggersSellStopPrice'];
 
 function ao(ordera) {
     var obj = {};
@@ -85,7 +93,7 @@ function oa(oin) {
     return a;
 }
 
-var Market = function (_MarketEngine) {
+var Market = exports.Market = function (_MarketEngine) {
     _inherits(Market, _MarketEngine);
 
     function Market(options) {
@@ -375,8 +383,3 @@ var Market = function (_MarketEngine) {
 
     return Market;
 }(_marketEngine.MarketEngine);
-
-module.exports.orderHeader = orderHeader;
-module.exports.oa = oa;
-module.exports.ao = ao;
-module.exports.Market = Market;
