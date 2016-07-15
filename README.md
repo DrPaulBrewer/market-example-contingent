@@ -15,8 +15,11 @@ Built using market-engine, market-pricing, and partial-index packages also poste
 
 ##Initialization
 
-    const MEC = require('market-example-contingent');
-    var XMarket = new MEC.Market({money:'coins', goods:'X'});
+    import * as MEC from 'market-example-contingent'; // ES6
+
+    const MEC = require('market-example-contingent'); // CJS
+
+    const XMarket = new MEC.Market({money:'coins', goods:'X', ...other options...});
 
 ##Provides
 * `new MEC.Market(config)` constructor function for Market.  
@@ -41,17 +44,11 @@ This means `MEC.Market` understands `.push(some_order)` and `.trade(tradeSpec)` 
 as well as `.on('someEvent', function(params){ ... })` and `.emit('someEvent')` from 
 [`EventEmitter`](https://nodejs.org/dist/latest-v4.x/docs/api/events.html).
 
-##Isomorphic Javascript
-
-This code will run either on nodejs 6 or on the latest Chrome, FF, and Edge browsers, and can be bundled via [browserify](https://github.com/substack/node-browserify)
-for most modern browsers. n The code is currently written in ES6 style with commonJS require() instead of ES6 modules. There is
-no transpilation step.  Developers are free to use an appropriate transpiler/loader stack if they wish.  
-
 #Usage
 
-##Introduction
+##Documentation on ESDoc
 
-Introduction goes here. 
+The [primary documentation for market-example-contingent is on ESDoc](https://doc.esdoc.org/github.com/DrPaulBrewer/market-example-contingent/)
 
 ##Creating Event Handlers
    
