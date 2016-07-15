@@ -59,8 +59,20 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-// orderHeader is defined for ease of writing a header line for orders to a CSV file or a table heading
+/**
+ * orderHeader defines the order of fields in an accepted order.  pre-orders start with field 2, the 't' field, as field 0.  
+ *
+ * @type {string[]} orderHeader
+ */
+
 var orderHeader = exports.orderHeader = ['count', 'tlocal', 't', 'tx', 'id', 'cancel', 'q', 'buyPrice', 'sellPrice', 'buyStop', 'buyStopPrice', 'sellStop', 'sellStopPrice', 'triggersBuyPrice', 'triggersSellPrice', 'triggersBuyStop', 'triggersBuyStopPrice', 'triggersSellStop', 'triggersSellStopPrice'];
+
+/**
+ * convert order from array format to object format using field names from orderHeader
+ *
+ * @param {number[]} ordera Order in array format, either a 17 number array or a 19 number array.
+ * @return {Object} order object with fields from orderHeader
+ */
 
 function ao(ordera) {
     var obj = {};
@@ -80,6 +92,12 @@ function ao(ordera) {
     }return obj;
 }
 
+/**
+ * convert order from object format to 17-element pre-order array format 
+ * @param oin Object format order in, using keys from orderHeader
+ * @return {number[]} 17 element pre-order array, suitable for use with .push()
+ */
+
 function oa(oin) {
     var a = [];
     var i = void 0,
@@ -93,8 +111,30 @@ function oa(oin) {
     return a;
 }
 
+/**
+ * Market with contingent order features, such as stop orders, one-cancels-other orders and one-sends-other orders
+ */
+
 var Market = exports.Market = function (_MarketEngine) {
     _inherits(Market, _MarketEngine);
+
+    /**
+     * Market constructor
+     *
+     * @param {Object} options Options affecting market behavior.  Also passed to marekt-engine constructor.  Accessible later in this.o
+     * @param {number} [options.buyImprove] If positive, indicates entry in buy book new buy order must beat to be acceptable. 0=off. 1= new buy must beat book highest buy. 2=must beat 2nd best book,etc.
+     * @param {number} [options.sellImprove] If positive, indicates entry in sell book new sell order must beat to be acceptable. 0=off. 1= new sell must be lower than lowest previous sell order on book.
+     * @param {boolean} [options.resetAfterEachTrade] If true, calls .clear() after each trade, clearing the market books and active trade list.
+     * @param {number} [options.buySellBookLimit] If positive, after each trade keeps at most buySellBookLimit orders in the buy book, and buySellBookLimit orders in the sell book, deleting other orders.
+     * @param {boolean} [options.bookfixed] If true, books are fixed size and scan active list after each trade. If false, books are accordian-style that can shrink 50% before re-scanning old orders.
+     * @param {number} [options.booklimit=100] Indicates maximum and initial size, in orders, of order book for each category (buy,sell,buystop,sellstop). 
+     * @listens {bump} triggering book update with .cleanup() when orders are bumped off due to cancellation/expiration
+     * @listens {before-order} triggering check of .improvementRule() to check new orders against .buyImprove/.sellImprove
+     * @listens {order} to detect trades between orders, and when trades are found, calling market-engine inherited .trade() method
+     * @listens {trade} triggering one-sends-other orders via .tradeTrigger() to be pushed to .inbox
+     * @listens {trade-cleanup} triggering stop orders to .inbox, rescanning order books and applying post-trade book size limits
+     * @listens {stops} to push buy/sell orders resulting from stops to .inbox
+     */
 
     function Market(options) {
         _classCallCheck(this, Market);
@@ -142,6 +182,14 @@ var Market = exports.Market = function (_MarketEngine) {
         return _this;
     }
 
+    /**
+     * before-order event-handler for enforcing improvementRule.  Note: you would not normally need to explicitly call this method, as the constructor attaches it as a before-order handler.
+     * 
+     * @param {number[]} A pre-order which is a 17 element number array.  Provided by market-engine before-order event handler.
+     * @param {function(rejectedOrder:number[])} Function with side-effect of marking orders as rejected.  Provided by market-engine before-order event handler.
+     * @private
+     */
+
     _createClass(Market, [{
         key: 'improvementRule',
         value: function improvementRule(neworder, reject) {
@@ -152,6 +200,12 @@ var Market = exports.Market = function (_MarketEngine) {
             // if sellImprove rule in effect, reject sell orders if new order price not below price from book
             if (this.o.sellImprove && neworder[spCol] && this.book.sell.idx && this.book.sell.idx.length >= this.o.sellImprove && neworder[spCol] >= this.book.sell.val(this.o.sellImprove - 1)) return reject(neworder);
         }
+
+        /**
+         * enforce market reset or book trimming after each trade.  Called automatically by trade-cleanup event handler.
+         * @private
+         */
+
     }, {
         key: 'bookSizeRule',
         value: function bookSizeRule() {
@@ -193,23 +247,49 @@ var Market = exports.Market = function (_MarketEngine) {
                 })();
             }
         }
+
+        /**
+         * market current Bid Price 
+         * @return {number|undefined} price of highest buy limit order from market buy limit order book, if any.
+         */
+
     }, {
         key: 'currentBidPrice',
         value: function currentBidPrice() {
             // relies on buy book sorted by price first because .val returns primary sort key
             return this.book.buy.val(0);
         }
+
+        /**
+         * market current Ask Price
+         * @return {number|undefined} price of lowest sell limit order from market sell limit order book, if any.
+         */
+
     }, {
         key: 'currentAskPrice',
         value: function currentAskPrice() {
             // relies on sell book sorted by price first because .val returns primary sort key
             return this.book.sell.val(0);
         }
+
+        /**
+         * last trade price, if any.
+         * @return {number|undefined}
+         */
+
     }, {
         key: 'lastTradePrice',
         value: function lastTradePrice() {
             if (this.lastTrade && this.lastTrade.prices && this.lastTrade.prices.length) return this.lastTrade.prices[this.lastTrade.prices.length - 1];
         }
+
+        /**
+         * called automatically in after-trade listener: searches stop books for stop orders and emits stop for stop orders triggered by the trading in parameter tradespec
+         * @param {Object} tradespec Trading specification produced from limit order matching.
+         * @emits {stops(t, matches)} when a change in trade price should trigger a stop order
+         * @private
+         */
+
     }, {
         key: 'findAndProcessStops',
         value: function findAndProcessStops(tradespec) {
@@ -218,6 +298,12 @@ var Market = exports.Market = function (_MarketEngine) {
                 this.emit('stops', tradespec.t, matches);
             }
         }
+
+        /**
+         * called automatically in order listener: determines trades between limit buy orders and limit sell orders, calling market-engine .trade()
+         * @private
+         */
+
     }, {
         key: 'findAndProcessTrades',
         value: function findAndProcessTrades() {
@@ -247,6 +333,14 @@ var Market = exports.Market = function (_MarketEngine) {
                 this.lastTrade = tradeSpec;
             }
         }
+
+        /**
+         * returns a 2 element array indicating [number of buy-stop, number of sell-stop] that are triggered by the reported trades in parameter tradespec
+         * called automatically in stop order scanning
+         * @param {Object} tradespec Trade specification
+         * @private
+         */
+
     }, {
         key: 'stopsMatch',
         value: function stopsMatch(tradespec) {
@@ -255,6 +349,14 @@ var Market = exports.Market = function (_MarketEngine) {
             var high = Math.max.apply(Math, _toConsumableArray(prices));
             return [this.book.buyStop.valBisect(high) || 0, this.book.sellStop.valBisect(low) || 0];
         }
+
+        /**
+         * changes a portion or all of one or more stop orders into limit orders for execution that are pushed into .inbox
+         * @param {number} t Effective time.
+         * @param {matches} two element array from Market#stopsMatch
+         * @private
+         */
+
     }, {
         key: 'stopsTrigger',
         value: function stopsTrigger(t, matches) {
@@ -308,6 +410,16 @@ var Market = exports.Market = function (_MarketEngine) {
             }
             this.cleanup();
         }
+
+        /**
+         * Push to .inbox an order triggered by partial or full execution of an OSO one-sends-other
+         * i.e. any order with the last 6 fields filled.
+         * @param {number} j The OSO order's index in the active list a[]
+         * @param {number} q The quantity executed of the OSO order, determining the q of the new order for execution. 
+         * @param {number} t The effective time
+         * @private
+         */
+
     }, {
         key: 'triggerOrderToInbox',
         value: function triggerOrderToInbox(j, q, t) {
@@ -335,6 +447,14 @@ var Market = exports.Market = function (_MarketEngine) {
                 }
             }
         }
+
+        /**
+         * Push to .inbox any orders triggered by OSO orders involved in trades in parameter tradespec.
+         * Called automatically by trade listener set up in constructor
+         * @param {Object} tradespec Trade specification
+         * @private
+         */
+
     }, {
         key: 'tradeTrigger',
         value: function tradeTrigger(tradespec) {
@@ -350,20 +470,86 @@ var Market = exports.Market = function (_MarketEngine) {
                 this.triggerOrderToInbox(sellA[_i], sellQ[_i], t);
             }
         }
+
+        /**
+         * clears or resets market to initial "new" condition, clearing active list, books, and trash
+         */
+
     }, {
         key: 'clear',
         value: function clear() {
-            _get(Object.getPrototypeOf(Market.prototype), 'clear', this).call(this); // clears .a
+            _get(Object.getPrototypeOf(Market.prototype), 'clear', this).call(this); // clears .a and .trash
+
+            /**
+             * container for books and book settings
+             * @type {Object} this.book
+             */
+
             this.book = {};
+
+            /**
+             * upper limit for book size
+             * @type {number} this.book.limit 
+             */
+
             this.book.limit = this.o.booklimit || 100;
+
+            /**
+             * indicator that book is fixed-size (true) or accordian (false)
+             * @type {boolean} this.book.fixed
+             */
+
             this.book.fixed = this.o.bookfixed;
+
+            /**
+             * buy order book provided by PartialIndex 
+             * @type {Object} this.book.buy
+             */
+
             this.book.buy = new _partialIndex2.default(this.a, this.book.limit, this.o.bpCol, -1, this.o.countCol, 1, this.o.qCol, 1);
+
+            /**
+             * sell order book provided by PartialIndex 
+             * @type {Object} this.book.sell
+             */
+
             this.book.sell = new _partialIndex2.default(this.a, this.book.limit, this.o.spCol, 1, this.o.countCol, 1, this.o.qCol, 1);
+
+            /**
+             * buyStop order book provided by PartialIndex 
+             * @type {Object} this.book.buyStop
+             */
+
             this.book.buyStop = new _partialIndex2.default(this.a, this.book.limit, this.o.bsCol, 1, this.o.countCol, 1, this.o.qCol, 1);
+
+            /**
+             * sellStop order book provided by PartialIndex 
+             * @type {Object} this.book.sellStop
+             */
+
             this.book.sellStop = new _partialIndex2.default(this.a, this.book.limit, this.o.ssCol, -1, this.o.countCol, 1, this.o.qCol, 1);
+
+            /**
+             * list of all books
+             * @type {Array<Object>} this.books
+             */
+
             this.books = [this.book.buy, this.book.sell, this.book.buyStop, this.book.sellStop];
+
+            /**
+             * inbox for pre-orders from internal processes such as stops and triggers. new orders should also be pushed here.
+             * @type {Array<number[]>} this.inbox
+             */
+
             this.inbox = [];
         }
+
+        /**
+         * emties trashed orders from book lists and scans active list to refill books.  
+         * Called by other methods as needed.  You probably won't need to call this function, unless implementing new functionality that affects the books or trashes orders.
+         * @private
+         */
+
     }, {
         key: 'cleanup',
         value: function cleanup() {
