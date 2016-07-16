@@ -9,11 +9,9 @@ const {Market, orderHeader, oa, ao} = marketExampleContingent;
 
 function process(M, orderList){
    orderList.forEach(function(myorder){
-       if (!myorder)
-           throw new Error("check test orders input to process(): order undefined");
-       M.inbox.push(myorder);
-       while (M.inbox.length>0)
-           M.push(M.inbox.shift());
+       const err = M.submit(myorder);
+       if (err) throw new Error(err);
+       while (M.process());
    });
 }
 

@@ -183,14 +183,44 @@ var Market = exports.Market = function (_MarketEngine) {
     }
 
     /**
-     * before-order event-handler for enforcing improvementRule.  Note: you would not normally need to explicitly call this method, as the constructor attaches it as a before-order handler.
-     * 
-     * @param {number[]} A pre-order which is a 17 element number array.  Provided by market-engine before-order event handler.
-     * @param {function(rejectedOrder:number[])} Function with side-effect of marking orders as rejected.  Provided by market-engine before-order event handler.
-     * @private
+     * submit order to the Market's inbox for eventual processing
+     *
+     * @param {number[]} neworder a 17 element number array represeting an unentered order.
+     * @return {string|undefined} Error message on invalid order format, undefined on ok submission
      */
 
     _createClass(Market, [{
+        key: 'submit',
+        value: function submit(neworder) {
+            if (Array.isArray(neworder) && neworder.length === orderHeader.length - 2) {
+                this.inbox.push(neworder);
+                return undefined;
+            }
+            return "market-example-contingent.submit: Invalid order, not an array of the correct length, got:" + JSON.stringify(neworder);
+        }
+
+        /**
+         * process order from the top of the inbox, returning inbox length
+         *
+         * @return {number} number of orders remaining in inbox
+         */
+
+    }, {
+        key: 'process',
+        value: function process() {
+            if (this.inbox.length > 0) this.push(this.inbox.shift());
+            return this.inbox.length;
+        }
+
+        /**
+         * before-order event-handler for enforcing improvementRule.  Note: you would not normally need to explicitly call this method, as the constructor attaches it as a before-order handler.
+         * 
+         * @param {number[]} A pre-order which is a 17 element number array.  Provided by market-engine before-order event handler.
+         * @param {function(rejectedOrder:number[])} Function with side-effect of marking orders as rejected.  Provided by market-engine before-order event handler.
+         * @private
+         */
+
+    }, {
         key: 'improvementRule',
         value: function improvementRule(neworder, reject) {
             var bpCol = this.o.bpCol,

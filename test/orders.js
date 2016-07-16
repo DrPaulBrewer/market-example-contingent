@@ -52,8 +52,8 @@ module.exports = {
 	0,    // limit
 	0,    // trigger buy price
 	0,    // trgger sell price
-	0,    // trigger buy stop
-	0     // trigger sell stop
+	0,0,    // trigger buy stop
+	0,0     // trigger sell stop
     ],
 
     id2_sell_1_at_95: [

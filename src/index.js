@@ -168,6 +168,33 @@ export class Market extends MarketEngine {
     }
 
     /**
+     * submit order to the Market's inbox for eventual processing
+     *
+     * @param {number[]} neworder a 17 element number array represeting an unentered order.
+     * @return {string|undefined} Error message on invalid order format, undefined on ok submission
+     */
+    
+    submit(neworder){
+        if (Array.isArray(neworder) && (neworder.length===(orderHeader.length-2))){
+            this.inbox.push(neworder);
+            return undefined;
+        }
+        return "market-example-contingent.submit: Invalid order, not an array of the correct length, got:"+JSON.stringify(neworder);
+    }
+
+    /**
+     * process order from the top of the inbox, returning inbox length
+     *
+     * @return {number} number of orders remaining in inbox
+     */
+
+    process(){
+        if (this.inbox.length>0)
+            this.push(this.inbox.shift());
+        return this.inbox.length;
+    }
+
+    /**
      * before-order event-handler for enforcing improvementRule.  Note: you would not normally need to explicitly call this method, as the constructor attaches it as a before-order handler.
      * 
      * @param {number[]} A pre-order which is a 17 element number array.  Provided by market-engine before-order event handler.
@@ -455,69 +482,69 @@ export class Market extends MarketEngine {
 
     clear(){
         super.clear(); // clears .a and .trash
-	
-	/**
-	 * container for books and book settings
-	 * @type {Object} this.book
-	 */
-		
+        
+        /**
+         * container for books and book settings
+         * @type {Object} this.book
+         */
+                
         this.book = {};
 
-	/**
-	 * upper limit for book size
-	 * @type {number} this.book.limit 
-	 */
+        /**
+         * upper limit for book size
+         * @type {number} this.book.limit 
+         */
 
         this.book.limit = this.o.booklimit || 100;
 
-	/**
-	 * indicator that book is fixed-size (true) or accordian (false)
-	 * @type {boolean} this.book.fixed
-	 */
-	
+        /**
+         * indicator that book is fixed-size (true) or accordian (false)
+         * @type {boolean} this.book.fixed
+         */
+        
         this.book.fixed = this.o.bookfixed;
 
-	/**
-	 * buy order book provided by PartialIndex 
-	 * @type {Object} this.book.buy
-	 */
+        /**
+         * buy order book provided by PartialIndex 
+         * @type {Object} this.book.buy
+         */
 
         this.book.buy  = new PartialIndex(this.a,this.book.limit,this.o.bpCol,-1,this.o.countCol,1,this.o.qCol,1);
 
-	/**
-	 * sell order book provided by PartialIndex 
-	 * @type {Object} this.book.sell
-	 */
+        /**
+         * sell order book provided by PartialIndex 
+         * @type {Object} this.book.sell
+         */
 
         this.book.sell = new PartialIndex(this.a,this.book.limit,this.o.spCol,1,this.o.countCol,1,this.o.qCol,1);
 
-	/**
-	 * buyStop order book provided by PartialIndex 
-	 * @type {Object} this.book.buyStop
-	 */
+        /**
+         * buyStop order book provided by PartialIndex 
+         * @type {Object} this.book.buyStop
+         */
 
 
         this.book.buyStop =  new PartialIndex(this.a,this.book.limit,this.o.bsCol,1,this.o.countCol,1,this.o.qCol,1);
-	
-	/**
-	 * sellStop order book provided by PartialIndex 
-	 * @type {Object} this.book.sellStop
-	 */
+        
+        /**
+         * sellStop order book provided by PartialIndex 
+         * @type {Object} this.book.sellStop
+         */
 
 
         this.book.sellStop = new PartialIndex(this.a,this.book.limit,this.o.ssCol,-1,this.o.countCol,1,this.o.qCol,1);
 
-	/**
-	 * list of all books
-	 * @type {Array<Object>} this.books
-	 */
+        /**
+         * list of all books
+         * @type {Array<Object>} this.books
+         */
 
         this.books = [this.book.buy,this.book.sell,this.book.buyStop,this.book.sellStop];
 
-	/**
-	 * inbox for pre-orders from internal processes such as stops and triggers. new orders should also be pushed here.
-	 * @type {Array<number[]>} this.inbox
-	 */
+        /**
+         * inbox for pre-orders from internal processes such as stops and triggers. new orders should also be pushed here.
+         * @type {Array<number[]>} this.inbox
+         */
 
         this.inbox = [];
     }
