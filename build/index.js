@@ -9,21 +9,22 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; }; // Copyright 2016 Paul Brewer, Economic and FInancial Technology Consulting LLC
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; // Copyright 2016 Paul Brewer, Economic and FInancial Technology Consulting LLC 
 // This is open source software. The MIT License applies to this software.
 // see https://opensource.org/licenses/MIT or included License.md file
+
 
 // order format
 // order = [
 // 0      counter: // strictly increasing, may have gaps
 // 1      tlocal: // local insertion time   (numeric JS timestamp)
 // 2      t: // official time
-// 3      tx: // expiration time, in units of official time
+// 3      tx: // expiration time, in units of official time 
 // 4      u: user number
 // 5      c: // 1 to cancel all active orders by userid
 // 6      q: // quantity (could be 0)
 // 7      b: // limit order price to buy
-// 8      s: // limit order price to sell
+// 8      s: // limit order price to sell 
 // 9      bs: // buy stop.  rising price triggers market order to buy (numeric)
 // 10     bsp: // buy stop limit price. buy limit price sent when trade price is greater than or equal to stop
 // 11     ss: // sell stop. falling price triggers market order to sell (numeric)
@@ -35,6 +36,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 // 17     trigss: // triggers new sell stop order asap
 // 18     trigssp: // limit price if triggered sell stop is activated
 // ]
+
 
 exports.ao = ao;
 exports.oa = oa;
@@ -159,7 +161,7 @@ var Market = exports.Market = function (_MarketEngine) {
             trigSliceEnd: 19
         };
 
-        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Market).call(this, Object.assign({}, defaults, options)));
+        var _this = _possibleConstructorReturn(this, (Market.__proto__ || Object.getPrototypeOf(Market)).call(this, Object.assign({}, defaults, options)));
 
         _this.on('bump', _this.cleanup); // update books if orders are bumped off in a bump even
         _this.on('before-order', _this.improvementRule);
@@ -342,7 +344,7 @@ var Market = exports.Market = function (_MarketEngine) {
             var i = void 0,
                 l = void 0;
             while ((seqtrades = _marketPricing2.default.sequential(this.book.buy.idxdata(), this.book.sell.idxdata(), this.o.countCol, this.o.bpCol, this.o.qCol, this.o.spCol, this.o.qCol)) !== undefined) {
-                // returns seqtrades = ['b'||'s', prices[], totalQ, buyQ[], sellQ[] ]      
+                // returns seqtrades = ['b'||'s', prices[], totalQ, buyQ[], sellQ[] ]       
                 tradeSpec = {
                     t: seqtrades[0] === 'b' ? this.book.buy.idxdata(0)[this.o.tCol] : this.book.sell.idxdata(0)[this.o.tCol],
                     bs: seqtrades[0],
@@ -508,7 +510,7 @@ var Market = exports.Market = function (_MarketEngine) {
     }, {
         key: 'clear',
         value: function clear() {
-            _get(Object.getPrototypeOf(Market.prototype), 'clear', this).call(this); // clears .a and .trash
+            _get(Market.prototype.__proto__ || Object.getPrototypeOf(Market.prototype), 'clear', this).call(this); // clears .a and .trash
 
             /**
              * container for books and book settings

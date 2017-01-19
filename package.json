@@ -20,7 +20,7 @@
   "author": "drpaulbrewer@eaftc.com",
   "license": "MIT",
   "dependencies": {
-    "market-engine": "^0.10.0",
+    "market-engine": "^0.11.0",
     "market-pricing": "^1",
     "partial-index": "^1"
   },
