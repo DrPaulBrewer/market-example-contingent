@@ -116,7 +116,7 @@ export class Market extends MarketEngine {
      * @param {number} [options.sellImprove] If positive, indicates entry in sell book new sell order must beat to be acceptable. 0=off. 1= new sell must be lower than lowest previous sell order on book.
      * @param {boolean} [options.resetAfterEachTrade] If true, calls .clear() after each trade, clearing the market books and active trade list.
      * @param {number} [options.buySellBookLimit] If positive, after each trade keeps at most buySellBookLimit orders in the buy book, and buySellBookLimit orders in the sell book, deleting other orders.
-     * @param {boolean} [options.bookfixed] If true, books are fixed size and scan active list after each trade. If false, books are accordian-style that can shrink 50% before re-scanning old orders.
+     * @param {boolean} [options.bookfixed=1] If true, books are fixed size and scan active list after each trade. If false, books are accordian-style that can shrink 50% before re-scanning old orders.
      * @param {number} [options.booklimit=100] Indicates maximum and initial size, in orders, of order book for each category (buy,sell,buystop,sellstop). 
      * @listens {bump} triggering book update with .cleanup() when orders are bumped off due to cancellation/expiration
      * @listens {before-order} triggering check of .improvementRule() to check new orders against .buyImprove/.sellImprove
@@ -144,7 +144,9 @@ export class Market extends MarketEngine {
             ssCol:11,
             sspCol:12,
             trigSliceBegin:13,
-            trigSliceEnd:19
+            trigSliceEnd:19,
+            bookfixed: 1,
+            booklimit: 100
         };
         super(Object.assign({}, defaults, options));
         this.on('bump', this.cleanup); // update books if orders are bumped off in a bump even

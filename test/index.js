@@ -631,7 +631,7 @@ describe('Market(options={})', function(){
             orders.id2_sell_1_at_115,
             orders.id2_sell_1_at_105
         ]);
-        let AM = new Market({});
+        let AM = new Market({bookfixed:0});
         let trades=[], stops = [];
         AM.on('trade', function(tradespec){ trades.push(tradespec); });
         AM.on('stops', function(t, matches){ stops.push(matches); });
@@ -770,6 +770,158 @@ describe('Market(options={})', function(){
         });
     });
 
+    describe('300 buy 1@100, 1@110,1@120, sell stop 1@112, sell stop 250@112, sell 1@115, sell 1@105', function(){
+        let scenario=[];
+        for(let i=0,l=300;i<l;++i)
+            scenario.push(orders.id1_buy_1_at_100.slice());
+        scenario.push(...[
+            orders.id1_buy_1_at_110,
+            orders.id1_buy_1_at_120,
+            orders.id3_sellstop_1_at_112,
+            orders.id3_sellstop_250_at_112,
+            orders.id2_sell_1_at_115,
+            orders.id2_sell_1_at_105
+        ]);
+        let AM = new Market({bookfixed:1});
+        let trades=[], stops = [];
+        AM.on('trade', function(tradespec){ trades.push(tradespec); });
+        AM.on('stops', function(t, matches){ stops.push(matches); });
+        process(AM, scenario);
+        it('should have empty inbox', function(){
+            assert.equal(AM.inbox.length, 0);
+        });
+        it('should execute a stop-loss', function(){
+            assert.ok(stops.length>0);
+        });
+        it('should generate a match against stop books of [0,2]', function(){
+            stops.should.deepEqual([[0,2]]);
+        });
+        it('should generate 6 trades', function(){
+            // each book.limit===100 matches will appear in a separate trade
+            assert.equal(trades.length, 6);
+        });
+        it('should generate the correct first trade', function(){
+            trades[0].should.deepEqual({
+                t: 0,
+                bs: 's',
+                prices: [120],
+                totalQ: 1,
+                buyQ: [1],
+                sellQ: [1],
+                buyId: [1],
+                sellId: [2],
+                buyA: [301],
+                sellA: [304]            
+            });
+        });
+        it('should generate the correct second trade', function(){
+            trades[1].should.deepEqual({
+                t:0,
+                bs: 's',
+                prices: [110],
+                totalQ: 1,
+                buyQ: [1],
+                sellQ: [1],
+                buyId: [1],
+                sellId: [2],
+                buyA: [300],
+                sellA: [303]
+            });
+        });
+        it('should generate the correct third trade', function(){
+            trades[2].should.deepEqual({
+                t:0,
+                bs: 's',
+                prices: [100],
+                totalQ: 1,
+                buyQ: [1],
+                sellQ: [1],
+                buyId: [1],
+                sellId: [3],
+                buyA: [0],
+                sellA: [300]            
+            });
+        });
+        it('should generate the correct fourth trade', function(){
+            let i;
+            let myBuyA = [];
+            for(i=0;i<100;++i){ 
+                myBuyA[i]=i;
+            }
+            trades[3].should.deepEqual({
+                t:0,
+                bs: 's',
+                prices: (new Array(100).fill(100)),
+                totalQ: 100,
+                buyQ: (new Array(100).fill(1)),
+                sellQ: [100],
+                buyId: (new Array(100).fill(1)),
+                sellId: [3],
+                buyA: myBuyA,
+                sellA: [299]
+            });
+        });
+        it('should generate the correct fifth trade', function(){
+            let i;
+            let myBuyA = [];
+            for(i=0;i<100;++i)
+                myBuyA[i] = i;
+            trades[4].should.deepEqual({
+                t:0,
+                bs: 's',
+                prices: (new Array(100).fill(100)),
+                totalQ: 100,
+                buyQ: (new Array(100).fill(1)),
+                sellQ: [100],
+                buyId: (new Array(100).fill(1)),
+                sellId: [3],
+                buyA: myBuyA,
+                sellA: [199]
+            });
+        });
+        it('should generate the correct sixth trade', function(){
+            let i;
+            let myBuyA = [];
+            for(i=0;i<50;++i)
+                myBuyA[i]=i;
+            trades[5].should.deepEqual({
+                t:0,
+                bs: 's',
+                prices: (new Array(50).fill(100)),
+                totalQ: 50,
+                buyQ: (new Array(50).fill(1)),
+                sellQ: [50],
+                buyId: (new Array(50).fill(1)),
+                sellId: [3],
+                buyA: myBuyA,
+                sellA: [99]
+            });
+        });
+        it('.lastTradePrice() should return 100', function(){
+            AM.lastTradePrice().should.equal(100);
+        });
+        it('should have 49 orders in buy book', function(){
+            assert.equal(AM.book.buy.idx.length, 49);
+        });
+        it('.currentBidPrice() should return 100', function(){
+            AM.currentBidPrice().should.equal(100);
+        });
+        it('should have 49 orders in .a', function(){
+            assert.equal(AM.a.length, 49);
+        });
+        it('should have empty sell book', function(){
+            assert.ok(AM.book.sell.idx.length === 0);
+        });
+        it('.currentAskPrice() should return undefined', function(){
+            assert.ok(typeof(AM.currentAskPrice())==='undefined');
+        });
+        it('should have empty buyStop and sellStop books', function(){
+            assert.ok(AM.book.buyStop.idx.length === 0);
+            assert.ok(AM.book.sellStop.idx.length === 0);
+        });
+    });
+
+    
     describe('300 buy 1@100, 1@110,1@120, sell stop 1@112, sell stop 250@112 limit 112, sell 1@115, sell 1@105', function(){
         let scenario=[];
         let i,l;
@@ -783,7 +935,7 @@ describe('Market(options={})', function(){
             orders.id2_sell_1_at_115,
             orders.id2_sell_1_at_105
         ]);
-        let AM = new Market({});
+        let AM = new Market({bookfixed:0});
         let trades=[], stops = [];
         AM.on('trade', function(tradespec){ trades.push(tradespec); });
         AM.on('stops', function(t, matches){ stops.push(matches); });
@@ -875,6 +1027,115 @@ describe('Market(options={})', function(){
         });
     });
 
+    describe('300 buy 1@100, 1@110,1@120, sell stop 1@112, sell stop 250@112 limit 112, sell 1@115, sell 1@105', function(){
+        let scenario=[];
+        let i,l;
+        for(i=0,l=300;i<l;++i)
+            scenario.push(orders.id1_buy_1_at_100.slice());
+        scenario.push(...[
+            orders.id1_buy_1_at_110,
+            orders.id1_buy_1_at_120,
+            orders.id3_sellstop_1_at_112,
+            orders.id3_sellstop_250_at_112_limit_112,
+            orders.id2_sell_1_at_115,
+            orders.id2_sell_1_at_105
+        ]);
+        let AM = new Market({bookfixed:1});
+        let trades=[], stops = [];
+        AM.on('trade', function(tradespec){ trades.push(tradespec); });
+        AM.on('stops', function(t, matches){ stops.push(matches); });
+        process(AM, scenario);
+        it('should have empty inbox', function(){
+            assert.equal(AM.inbox.length, 0);
+        });
+        it('should execute a stop-loss', function(){
+            assert.ok(stops.length>0);
+        });
+        it('should generate a match against stop books of [0,2]', function(){
+            stops.should.deepEqual([[0,2]]);
+        });
+        it('should generate 3 trades', function(){
+            // each book.limit===100 matches will appear in a separate trade
+            assert.equal(trades.length, 3);
+        });
+        it('should generate the correct first trade', function(){
+            trades[0].should.deepEqual({
+                t: 0,
+                bs: 's',
+                prices: [120],
+                totalQ: 1,
+                buyQ: [1],
+                sellQ: [1],
+                buyId: [1],
+                sellId: [2],
+                buyA: [301],
+                sellA: [304]            
+            });
+        });
+        it('should generate the correct second trade', function(){
+            trades[1].should.deepEqual({
+                t:0,
+                bs: 's',
+                prices: [110],
+                totalQ: 1,
+                buyQ: [1],
+                sellQ: [1],
+                buyId: [1],
+                sellId: [2],
+                buyA: [300],
+                sellA: [303]
+            });
+        });
+        it('should generate the correct third trade', function(){
+            trades[2].should.deepEqual({
+                t:0,
+                bs: 's',
+                prices: [100],
+                totalQ: 1,
+                buyQ: [1],
+                sellQ: [1],
+                buyId: [1],
+                sellId: [3],
+                buyA: [0],
+                sellA: [300]            
+            });
+        });
+        it('.lastTradePrice() should return 100', function(){
+            AM.lastTradePrice().should.equal(100);
+        });
+	
+	// has 100 because of full rescan when bookfixed:1
+
+	it('should have 100 orders in buy book', function(){
+            assert.equal(AM.book.buy.idx.length, 100);
+        });
+        it('.currentBidPrice() should return 100', function(){
+            AM.currentBidPrice().should.equal(100);
+        });
+        it('should have 300 orders in .a', function(){
+            assert.equal(AM.a.length, 300);
+        });
+        it('should have one order in sell book', function(){
+            assert.ok(AM.book.sell.idx.length === 1);
+        });
+        it('should have first order in sell book be a limit sell order for 250 units at 112', function(){
+            let sell1 = AM.book.sell.idxdata(0);
+            let spCol = AM.o.spCol, ssCol = AM.o.ssCol, sspCol = AM.o.sspCol, qCol = AM.o.qCol;
+            assert.equal(sell1[spCol], 112);
+            assert.equal(sell1[ssCol], 0);
+            assert.equal(sell1[sspCol], 0);
+            assert.equal(sell1[qCol], 250);
+        });
+        it('should have .currentAskPrice() return 112', function(){
+            AM.currentAskPrice().should.equal(112);
+        });
+        it('should have empty buyStop and sellStop books', function(){
+            assert.ok(AM.book.buyStop.idx.length === 0);
+            assert.ok(AM.book.sellStop.idx.length === 0);
+        });
+    });
+
+    
     describe('buy triggers another buy', function(){
         let scenario = [
             orders.id2_sell_1_at_95,
