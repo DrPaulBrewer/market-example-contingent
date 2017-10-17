@@ -1,5 +1,7 @@
 market-example-contingent
 ===
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/DrPaulBrewer/market-example-contingent.svg)](https://greenkeeper.io/)
 [![Build Status](https://travis-ci.org/DrPaulBrewer/market-example-contingent.svg?branch=master)](https://travis-ci.org/DrPaulBrewer/market-example-contingent)
 [![Coverage Status](https://coveralls.io/repos/github/DrPaulBrewer/market-example-contingent/badge.svg?branch=master)](https://coveralls.io/github/DrPaulBrewer/market-example-contingent?branch=master)
 
