@@ -1,5 +1,4 @@
-market-example-contingent
-===
+# market-example-contingent
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/DrPaulBrewer/market-example-contingent.svg)](https://greenkeeper.io/)
 [![Build Status](https://travis-ci.org/DrPaulBrewer/market-example-contingent.svg?branch=master)](https://travis-ci.org/DrPaulBrewer/market-example-contingent)
@@ -9,13 +8,11 @@ market-example-contingent
 
 Built using market-engine, market-pricing, and partial-index packages also posted on npm
 
-### Warning: versions less than 1.0.0 are pre-release/experimental, may be subject to massive change without notice or not work 
-
-##Installation
+## Installation
 
     npm install market-example-contingent --save
 
-##Initialization
+## Initialization
 
     import * as MEC from 'market-example-contingent'; // ES6
 
@@ -23,13 +20,13 @@ Built using market-engine, market-pricing, and partial-index packages also poste
 
     const XMarket = new MEC.Market({money:'coins', goods:'X', ...other options...});
 
-##Provides
+## Provides
 * `new MEC.Market(config)` constructor function for Market.  
 * `MEC.orderHeader` 19 element array of strings, giving column headers for internal order array format
 * `MEC.oa(order_object)` function for converting orders from object format to array format
 * `MEC.ao(order_array)` function for converting orders from array format to object format
 
-##Inheritance Diagram
+## Inheritance Diagram
 
 `MEC.Market` inherits linearly from `market-engine` and `EventEmitter` and constructors are chained.
 
@@ -46,13 +43,13 @@ This means `MEC.Market` understands `.push(some_order)` and `.trade(tradeSpec)` 
 as well as `.on('someEvent', function(params){ ... })` and `.emit('someEvent')` from 
 [`EventEmitter`](https://nodejs.org/dist/latest-v4.x/docs/api/events.html).
 
-#Usage
+# Usage
 
-##Documentation on ESDoc
+## Documentation on ESDoc
 
 The [primary documentation for market-example-contingent is on ESDoc](https://doc.esdoc.org/github.com/DrPaulBrewer/market-example-contingent/)
 
-##Creating Event Handlers
+## Creating Event Handlers
    
     XMarket.on('trade', function(tradespec){ 
           // react to trade, do logging, etc.
@@ -102,7 +99,7 @@ See also the MarketEngine documentation in package `market-engine`, as the marke
 // ]
 </pre>
 
-##Order Lifecycle
+## Order Lifecycle
 
 An `order` begins life as 17 element numeric arrays, consisting of elements 2-18 above. 
 
