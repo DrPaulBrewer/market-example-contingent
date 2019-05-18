@@ -149,7 +149,7 @@ export class Market extends MarketEngine {
             booklimit: 100
         };
         super(Object.assign({}, defaults, options));
-        this.on('bump', this.cleanup); // update books if orders are bumped off in a bump even
+        this.on('bump', this.cleanup); // update books if orders are bumped off in a bump event
         this.on('before-order', this.improvementRule);
         this.on('order', function(){
             // order has already been pushed to .a in MarketEngine.order
