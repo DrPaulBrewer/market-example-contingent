@@ -31,12 +31,10 @@
     "@babel/preset-env": "^7.0.0",
     "@babel/register": "^7.0.0",
     "coveralls": "^3.0.0",
-<<<<<<< HEAD
     "esdoc": "^1.1.0",
     "eslint": "^5.14.1",
     "mocha": "^6.0.0",
     "nyc": "^14.1.1",
->>>>>>> d570f39a7bb5b639026ebea0dba39268647fd7b8
     "should": "^13.1.2"
   },
   "jsnext:main": "src/index.js"
