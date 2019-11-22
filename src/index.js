@@ -1,4 +1,4 @@
-// Copyright 2016 Paul Brewer, Economic and FInancial Technology Consulting LLC 
+// Copyright 2016 Paul Brewer, Economic and FInancial Technology Consulting LLC
 // This is open source software. The MIT License applies to this software.
 // see https://opensource.org/licenses/MIT or included License.md file
 
@@ -8,12 +8,12 @@
 // 0      counter: // strictly increasing, may have gaps
 // 1      tlocal: // local insertion time   (numeric JS timestamp)
 // 2      t: // official time
-// 3      tx: // expiration time, in units of official time 
+// 3      tx: // expiration time, in units of official time
 // 4      u: user number
 // 5      c: // 1 to cancel all active orders by userid
 // 6      q: // quantity (could be 0)
 // 7      b: // limit order price to buy
-// 8      s: // limit order price to sell 
+// 8      s: // limit order price to sell
 // 9      bs: // buy stop.  rising price triggers market order to buy (numeric)
 // 10     bsp: // buy stop limit price. buy limit price sent when trade price is greater than or equal to stop
 // 11     ss: // sell stop. falling price triggers market order to sell (numeric)
@@ -32,11 +32,11 @@ import marketPricing from 'market-pricing';
 import PartialIndex from 'partial-index';
 
 /**
- * orderHeader defines the order of fields in an accepted order.  pre-orders start with field 2, the 't' field, as field 0.  
+ * orderHeader defines the order of fields in an accepted order.  pre-orders start with field 2, the 't' field, as field 0.
  *
  * @type {string[]} orderHeader
  */
- 
+
 export const orderHeader = [
     'count',
     'tlocal',
@@ -84,7 +84,7 @@ export function ao(ordera){
 }
 
 /**
- * convert order from object format to 17-element pre-order array format 
+ * convert order from object format to 17-element pre-order array format
  * @param oin Object format order in, using keys from orderHeader
  * @return {number[]} 17 element pre-order array, suitable for use with .push()
  */
@@ -97,8 +97,8 @@ export function oa(oin){
             a[i-2] = oin[orderHeader[i]];
             if (!a[i-2]) a[i-2] = 0;
         }
-    }  
-    return a;   
+    }
+    return a;
 }
 
 /**
@@ -117,7 +117,7 @@ export class Market extends MarketEngine {
      * @param {boolean} [options.resetAfterEachTrade] If true, calls .clear() after each trade, clearing the market books and active trade list.
      * @param {number} [options.buySellBookLimit] If positive, after each trade keeps at most buySellBookLimit orders in the buy book, and buySellBookLimit orders in the sell book, deleting other orders.
      * @param {boolean} [options.bookfixed=1] If true, books are fixed size and scan active list after each trade. If false, books are accordian-style that can shrink 50% before re-scanning old orders.
-     * @param {number} [options.booklimit=100] Indicates maximum and initial size, in orders, of order book for each category (buy,sell,buystop,sellstop). 
+     * @param {number} [options.booklimit=100] Indicates maximum and initial size, in orders, of order book for each category (buy,sell,buystop,sellstop).
      * @listens {bump} triggering book update with .cleanup() when orders are bumped off due to cancellation/expiration
      * @listens {before-order} triggering check of .improvementRule() to check new orders against .buyImprove/.sellImprove
      * @listens {order} to detect trades between orders, and when trades are found, calling market-engine inherited .trade() method
@@ -128,7 +128,7 @@ export class Market extends MarketEngine {
 
     constructor(options){
         // defaults defined standard this.o.tCol, etc. is authoritative for locating particular data in an order
-        const defaults = { 
+        const defaults = {
             pushArray:1,
             countCol:0,
             tlocalCol:1,
@@ -175,7 +175,7 @@ export class Market extends MarketEngine {
      * @param {number[]} neworder a 17 element number array represeting an unentered order.
      * @return {string|undefined} Error message on invalid order format, undefined on ok submission
      */
-    
+
     submit(neworder){
         if (Array.isArray(neworder) && (neworder.length===(orderHeader.length-2))){
             this.inbox.push(neworder);
@@ -198,7 +198,7 @@ export class Market extends MarketEngine {
 
     /**
      * before-order event-handler for enforcing improvementRule.  Note: you would not normally need to explicitly call this method, as the constructor attaches it as a before-order handler.
-     * 
+     *
      * @param {number[]} A pre-order which is a 17 element number array.  Provided by market-engine before-order event handler.
      * @param {function(rejectedOrder:number[])} Function with side-effect of marking orders as rejected.  Provided by market-engine before-order event handler.
      * @private
@@ -208,13 +208,13 @@ export class Market extends MarketEngine {
         const bpCol = this.o.bpCol, spCol=this.o.spCol;
         // if buyImprove rule in effect, reject buy orders if new order price not above price from book
         if ( (this.o.buyImprove && neworder[bpCol]) &&
-             (this.book.buy.idx) && 
+             (this.book.buy.idx) &&
              (this.book.buy.idx.length >= this.o.buyImprove) &&
              (neworder[bpCol] <= this.book.buy.val(this.o.buyImprove-1))
            ) return reject(neworder);
         // if sellImprove rule in effect, reject sell orders if new order price not below price from book
         if ( (this.o.sellImprove && neworder[spCol]) &&
-             (this.book.sell.idx) && 
+             (this.book.sell.idx) &&
              (this.book.sell.idx.length >= this.o.sellImprove) &&
              (neworder[spCol] >= this.book.sell.val(this.o.sellImprove-1))
            ) return reject(neworder);
@@ -254,7 +254,7 @@ export class Market extends MarketEngine {
 
 
     /**
-     * market current Bid Price 
+     * market current Bid Price
      * @return {number|undefined} price of highest buy limit order from market buy limit order book, if any.
      */
 
@@ -267,7 +267,7 @@ export class Market extends MarketEngine {
      * market current Ask Price
      * @return {number|undefined} price of lowest sell limit order from market sell limit order book, if any.
      */
-    
+
     currentAskPrice(){
         // relies on sell book sorted by price first because .val returns primary sort key
         return this.book.sell.val(0);
@@ -277,7 +277,7 @@ export class Market extends MarketEngine {
      * last trade price, if any.
      * @return {number|undefined}
      */
-    
+
     lastTradePrice(){
         if (this.lastTrade && this.lastTrade.prices && this.lastTrade.prices.length)
             return this.lastTrade.prices[this.lastTrade.prices.length-1];
@@ -313,8 +313,8 @@ export class Market extends MarketEngine {
                                                      this.o.qCol,
                                                      this.o.spCol,
                                                      this.o.qCol))!==undefined){
-            // returns seqtrades = ['b'||'s', prices[], totalQ, buyQ[], sellQ[] ]       
-            tradeSpec = { 
+            // returns seqtrades = ['b'||'s', prices[], totalQ, buyQ[], sellQ[] ]
+            tradeSpec = {
                 t: ((seqtrades[0]==='b')? (this.book.buy.idxdata(0)[this.o.tCol]): (this.book.sell.idxdata(0)[this.o.tCol])),
                 bs: seqtrades[0],
                 prices: seqtrades[1],
@@ -347,7 +347,7 @@ export class Market extends MarketEngine {
         const low  = Math.min(...prices);
         const high = Math.max(...prices);
         return [
-            ( this.book.buyStop.valBisect(high) || 0), 
+            ( this.book.buyStop.valBisect(high) || 0),
             ( this.book.sellStop.valBisect(low) || 0)
         ];
     }
@@ -360,7 +360,7 @@ export class Market extends MarketEngine {
      */
 
     stopsTrigger(t, matches){
-        const o = this.o;    
+        const o = this.o;
         if (!matches) return;
         function toBuyAtMarket(buystop){
             const neworder = buystop.slice();  // includes triggers in copies, if any
@@ -381,7 +381,7 @@ export class Market extends MarketEngine {
             neworder[o.tCol] = t;
             neworder[o.txCol] = 0;
             neworder[o.cancelCol] = 0;
-            neworder[o.bpCol] = 0; 
+            neworder[o.bpCol] = 0;
             neworder[o.bsCol] = 0;
             neworder[o.bspCol] = 0;
             neworder[o.spCol] = neworder[o.sspCol];
@@ -399,7 +399,7 @@ export class Market extends MarketEngine {
                               );
             const trashIdxs = bs.idx.slice(0,matches[0]);
             this.inbox.push(...newOrders);
-            this.trash.push(...trashIdxs);   
+            this.trash.push(...trashIdxs);
         }
         if (matches[1]){
             const ss = this.book.sellStop;
@@ -419,11 +419,11 @@ export class Market extends MarketEngine {
      * Push to .inbox an order triggered by partial or full execution of an OSO one-sends-other
      * i.e. any order with the last 6 fields filled.
      * @param {number} j The OSO order's index in the active list a[]
-     * @param {number} q The quantity executed of the OSO order, determining the q of the new order for execution. 
+     * @param {number} q The quantity executed of the OSO order, determining the q of the new order for execution.
      * @param {number} t The effective time
      * @private
      */
-    
+
     triggerOrderToInbox(j,q,t){
         if ((j===undefined) || (!q)) return;
         const myorder = this.a[j];
@@ -449,10 +449,10 @@ export class Market extends MarketEngine {
                 trigorder[idCol-2] = myorder[idCol];
                 trigorder[qCol-2] = q;
                 for(let ii=0,ll=trigSliceEnd-trigSliceBegin;ii<ll;++ii)
-                    trigorder[bpCol+ii-2] = myorder[ii+trigSliceBegin]; 
+                    trigorder[bpCol+ii-2] = myorder[ii+trigSliceBegin];
                 inbox.push(trigorder);
             }
-        } 
+        }
     }
 
     /**
@@ -480,21 +480,21 @@ export class Market extends MarketEngine {
     /**
      * clears or resets market to initial "new" condition, clearing active list, books, and trash
      */
-    
+
 
     clear(){
         super.clear(); // clears .a and .trash
-        
+
         /**
          * container for books and book settings
          * @type {Object} this.book
          */
-                
+
         this.book = {};
 
         /**
          * upper limit for book size
-         * @type {number} this.book.limit 
+         * @type {number} this.book.limit
          */
 
         this.book.limit = this.o.booklimit || 100;
@@ -503,33 +503,33 @@ export class Market extends MarketEngine {
          * indicator that book is fixed-size (true) or accordian (false)
          * @type {boolean} this.book.fixed
          */
-        
+
         this.book.fixed = this.o.bookfixed;
 
         /**
-         * buy order book provided by PartialIndex 
+         * buy order book provided by PartialIndex
          * @type {Object} this.book.buy
          */
 
         this.book.buy  = new PartialIndex(this.a,this.book.limit,this.o.bpCol,-1,this.o.countCol,1,this.o.qCol,1);
 
         /**
-         * sell order book provided by PartialIndex 
+         * sell order book provided by PartialIndex
          * @type {Object} this.book.sell
          */
 
         this.book.sell = new PartialIndex(this.a,this.book.limit,this.o.spCol,1,this.o.countCol,1,this.o.qCol,1);
 
         /**
-         * buyStop order book provided by PartialIndex 
+         * buyStop order book provided by PartialIndex
          * @type {Object} this.book.buyStop
          */
 
 
         this.book.buyStop =  new PartialIndex(this.a,this.book.limit,this.o.bsCol,1,this.o.countCol,1,this.o.qCol,1);
-        
+
         /**
-         * sellStop order book provided by PartialIndex 
+         * sellStop order book provided by PartialIndex
          * @type {Object} this.book.sellStop
          */
 
@@ -552,7 +552,7 @@ export class Market extends MarketEngine {
     }
 
     /**
-     * emties trashed orders from book lists and scans active list to refill books.  
+     * empties trashed orders from book lists and scans active list to refill books.  
      * Called by other methods as needed.  You probably won't need to call this function, unless implementing new functionality that affects the books or trashes orders.
      * @private
      */

@@ -46,7 +46,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 /**
- * orderHeader defines the order of fields in an accepted order.  pre-orders start with field 2, the 't' field, as field 0.  
+ * orderHeader defines the order of fields in an accepted order.  pre-orders start with field 2, the 't' field, as field 0.
  *
  * @type {string[]} orderHeader
  */
@@ -82,7 +82,7 @@ function ao(ordera) {
   return obj;
 }
 /**
- * convert order from object format to 17-element pre-order array format 
+ * convert order from object format to 17-element pre-order array format
  * @param oin Object format order in, using keys from orderHeader
  * @return {number[]} 17 element pre-order array, suitable for use with .push()
  */
@@ -120,7 +120,7 @@ function (_MarketEngine) {
    * @param {boolean} [options.resetAfterEachTrade] If true, calls .clear() after each trade, clearing the market books and active trade list.
    * @param {number} [options.buySellBookLimit] If positive, after each trade keeps at most buySellBookLimit orders in the buy book, and buySellBookLimit orders in the sell book, deleting other orders.
    * @param {boolean} [options.bookfixed=1] If true, books are fixed size and scan active list after each trade. If false, books are accordian-style that can shrink 50% before re-scanning old orders.
-   * @param {number} [options.booklimit=100] Indicates maximum and initial size, in orders, of order book for each category (buy,sell,buystop,sellstop). 
+   * @param {number} [options.booklimit=100] Indicates maximum and initial size, in orders, of order book for each category (buy,sell,buystop,sellstop).
    * @listens {bump} triggering book update with .cleanup() when orders are bumped off due to cancellation/expiration
    * @listens {before-order} triggering check of .improvementRule() to check new orders against .buyImprove/.sellImprove
    * @listens {order} to detect trades between orders, and when trades are found, calling market-engine inherited .trade() method
@@ -216,7 +216,7 @@ function (_MarketEngine) {
     }
     /**
      * before-order event-handler for enforcing improvementRule.  Note: you would not normally need to explicitly call this method, as the constructor attaches it as a before-order handler.
-     * 
+     *
      * @param {number[]} A pre-order which is a 17 element number array.  Provided by market-engine before-order event handler.
      * @param {function(rejectedOrder:number[])} Function with side-effect of marking orders as rejected.  Provided by market-engine before-order event handler.
      * @private
@@ -281,7 +281,7 @@ function (_MarketEngine) {
       }
     }
     /**
-     * market current Bid Price 
+     * market current Bid Price
      * @return {number|undefined} price of highest buy limit order from market buy limit order book, if any.
      */
 
@@ -341,7 +341,7 @@ function (_MarketEngine) {
       var i, l;
 
       while ((seqtrades = _marketPricing["default"].sequential(this.book.buy.idxdata(), this.book.sell.idxdata(), this.o.countCol, this.o.bpCol, this.o.qCol, this.o.spCol, this.o.qCol)) !== undefined) {
-        // returns seqtrades = ['b'||'s', prices[], totalQ, buyQ[], sellQ[] ]       
+        // returns seqtrades = ['b'||'s', prices[], totalQ, buyQ[], sellQ[] ]
         tradeSpec = {
           t: seqtrades[0] === 'b' ? this.book.buy.idxdata(0)[this.o.tCol] : this.book.sell.idxdata(0)[this.o.tCol],
           bs: seqtrades[0],
@@ -459,7 +459,7 @@ function (_MarketEngine) {
      * Push to .inbox an order triggered by partial or full execution of an OSO one-sends-other
      * i.e. any order with the last 6 fields filled.
      * @param {number} j The OSO order's index in the active list a[]
-     * @param {number} q The quantity executed of the OSO order, determining the q of the new order for execution. 
+     * @param {number} q The quantity executed of the OSO order, determining the q of the new order for execution.
      * @param {number} t The effective time
      * @private
      */
@@ -538,7 +538,7 @@ function (_MarketEngine) {
       this.book = {};
       /**
        * upper limit for book size
-       * @type {number} this.book.limit 
+       * @type {number} this.book.limit
        */
 
       this.book.limit = this.o.booklimit || 100;
@@ -549,25 +549,25 @@ function (_MarketEngine) {
 
       this.book.fixed = this.o.bookfixed;
       /**
-       * buy order book provided by PartialIndex 
+       * buy order book provided by PartialIndex
        * @type {Object} this.book.buy
        */
 
       this.book.buy = new _partialIndex["default"](this.a, this.book.limit, this.o.bpCol, -1, this.o.countCol, 1, this.o.qCol, 1);
       /**
-       * sell order book provided by PartialIndex 
+       * sell order book provided by PartialIndex
        * @type {Object} this.book.sell
        */
 
       this.book.sell = new _partialIndex["default"](this.a, this.book.limit, this.o.spCol, 1, this.o.countCol, 1, this.o.qCol, 1);
       /**
-       * buyStop order book provided by PartialIndex 
+       * buyStop order book provided by PartialIndex
        * @type {Object} this.book.buyStop
        */
 
       this.book.buyStop = new _partialIndex["default"](this.a, this.book.limit, this.o.bsCol, 1, this.o.countCol, 1, this.o.qCol, 1);
       /**
-       * sellStop order book provided by PartialIndex 
+       * sellStop order book provided by PartialIndex
        * @type {Object} this.book.sellStop
        */
 
@@ -586,7 +586,7 @@ function (_MarketEngine) {
       this.inbox = [];
     }
     /**
-     * emties trashed orders from book lists and scans active list to refill books.  
+     * empties trashed orders from book lists and scans active list to refill books.  
      * Called by other methods as needed.  You probably won't need to call this function, unless implementing new functionality that affects the books or trashes orders.
      * @private
      */

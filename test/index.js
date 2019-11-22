@@ -65,7 +65,7 @@ describe('ao', function(){
         (function(){ ao({}); }).should.throw();
     });
 });
-        
+
 describe('Market(options={})', function(){
     it('should be a function', function(){
         Market.should.be.type('function');
@@ -106,7 +106,7 @@ describe('Market(options={})', function(){
         let AM = new Market({});
         initOK(AM);
     });
-    
+
     it('should clear correctly', function(){
         let AM = new Market({});
         AM.a.push([1,2,3]);
@@ -115,6 +115,14 @@ describe('Market(options={})', function(){
         AM.trash.push([2,3,4,5,6]);
         AM.clear();
         initOK(AM);
+    });
+
+    it('should reject bad submissions', function(){
+      let AM = new Market({});
+      let result = AM.submit([1,2,3]);
+      result.includes("Invalid").should.equal(true);
+      result = AM.submit({x:56, y:84});
+      result.includes("Invalid").should.equal(true);
     });
 
     describe('buy price less than sell price', function(){
@@ -223,7 +231,7 @@ describe('Market(options={})', function(){
             assert.ok(AM.book.sell.idx[0]===0);
             omit2(AM.a[0]).should.deepEqual(orders.id2_sell_1_at_125);
         });
-        
+
         it('.currentAskPrice() should return 125', function(){
             AM.currentAskPrice().should.equal(125);
         });
@@ -260,7 +268,7 @@ describe('Market(options={})', function(){
                 buyId: [1],
                 sellId: [2],
                 buyA: [2],
-                sellA: [3]              
+                sellA: [3]
             });
         });
 
@@ -276,7 +284,7 @@ describe('Market(options={})', function(){
             assert.ok(AM.book.buy.idx[0]===1);
             omit2(AM.a[1]).should.deepEqual(orders.id1_buy_1_at_110);
         });
-        
+
         it('.currentBidPrice() should return 110', function(){
             AM.currentBidPrice().should.equal(110);
         });
@@ -297,7 +305,7 @@ describe('Market(options={})', function(){
         });
     });
 
-   
+
     describe('buy 1@120, sell stop 1@112', function(){
         let scenario = [
             orders.id1_buy_1_at_120,
@@ -360,7 +368,7 @@ describe('Market(options={})', function(){
                 buyId: [1],
                 sellId: [2],
                 buyA: [0],
-                sellA: [2]              
+                sellA: [2]
             });
         });
         it('.lastTradePrice() should return 120', function(){
@@ -394,7 +402,7 @@ describe('Market(options={})', function(){
             });
         });
     });
-        
+
     describe('sell 1@105, buy stop 1@112, buy 1@110', function(){
         let scenario = [
             orders.id2_sell_1_at_105,
@@ -419,7 +427,7 @@ describe('Market(options={})', function(){
                 buyId: [1],
                 sellId: [2],
                 buyA: [2],
-                sellA: [0]              
+                sellA: [0]
             });
         });
         it('.lastTradePrice() should return 105', function(){
@@ -453,7 +461,7 @@ describe('Market(options={})', function(){
             });
         });
     });
-    
+
     describe('buy 1@100, 1@110,1@120, sell stop 1@112, sell 1@115, sell 1@105', function(){
         let scenario = [
             orders.id1_buy_1_at_100,
@@ -488,7 +496,7 @@ describe('Market(options={})', function(){
                 sellId: [2],
                 sellQ: [1],
                 buyA: [2],
-                sellA: [4]              
+                sellA: [4]
             });
         });
         it('should generate the correct second trade', function(){
@@ -516,7 +524,7 @@ describe('Market(options={})', function(){
                 buyId: [1],
                 sellId: [3],
                 buyA: [0],
-                sellA: [1]              
+                sellA: [1]
             });
         });
         it('.lastTradePrice() should return 100', function(){
@@ -571,7 +579,7 @@ describe('Market(options={})', function(){
                 buyId: [1],
                 sellId: [2],
                 buyA: [4],
-                sellA: [2]              
+                sellA: [2]
             });
         });
         it('should generate the correct second trade', function(){
@@ -599,7 +607,7 @@ describe('Market(options={})', function(){
                 buyId: [3],
                 sellId: [2],
                 buyA: [1],
-                sellA: [0]              
+                sellA: [0]
             });
         });
         it('.lastTradePrice() should return 125', function(){
@@ -660,7 +668,7 @@ describe('Market(options={})', function(){
                 buyId: [1],
                 sellId: [2],
                 buyA: [301],
-                sellA: [304]            
+                sellA: [304]
             });
         });
         it('should generate the correct second trade', function(){
@@ -688,13 +696,13 @@ describe('Market(options={})', function(){
                 buyId: [1],
                 sellId: [3],
                 buyA: [0],
-                sellA: [300]            
+                sellA: [300]
             });
         });
         it('should generate the correct fourth trade', function(){
             let i;
             let myBuyA = [];
-            for(i=0;i<97;++i){ 
+            for(i=0;i<97;++i){
                 myBuyA[i]=i;
             }
             trades[3].should.deepEqual({
@@ -811,7 +819,7 @@ describe('Market(options={})', function(){
                 buyId: [1],
                 sellId: [2],
                 buyA: [301],
-                sellA: [304]            
+                sellA: [304]
             });
         });
         it('should generate the correct second trade', function(){
@@ -839,13 +847,13 @@ describe('Market(options={})', function(){
                 buyId: [1],
                 sellId: [3],
                 buyA: [0],
-                sellA: [300]            
+                sellA: [300]
             });
         });
         it('should generate the correct fourth trade', function(){
             let i;
             let myBuyA = [];
-            for(i=0;i<100;++i){ 
+            for(i=0;i<100;++i){
                 myBuyA[i]=i;
             }
             trades[3].should.deepEqual({
@@ -921,7 +929,7 @@ describe('Market(options={})', function(){
         });
     });
 
-    
+
     describe('300 buy 1@100, 1@110,1@120, sell stop 1@112, sell stop 250@112 limit 112, sell 1@115, sell 1@105', function(){
         let scenario=[];
         let i,l;
@@ -964,7 +972,7 @@ describe('Market(options={})', function(){
                 buyId: [1],
                 sellId: [2],
                 buyA: [301],
-                sellA: [304]            
+                sellA: [304]
             });
         });
         it('should generate the correct second trade', function(){
@@ -992,7 +1000,7 @@ describe('Market(options={})', function(){
                 buyId: [1],
                 sellId: [3],
                 buyA: [0],
-                sellA: [300]            
+                sellA: [300]
             });
         });
         it('.lastTradePrice() should return 100', function(){
@@ -1069,7 +1077,7 @@ describe('Market(options={})', function(){
                 buyId: [1],
                 sellId: [2],
                 buyA: [301],
-                sellA: [304]            
+                sellA: [304]
             });
         });
         it('should generate the correct second trade', function(){
@@ -1097,13 +1105,13 @@ describe('Market(options={})', function(){
                 buyId: [1],
                 sellId: [3],
                 buyA: [0],
-                sellA: [300]            
+                sellA: [300]
             });
         });
         it('.lastTradePrice() should return 100', function(){
             AM.lastTradePrice().should.equal(100);
         });
-	
+
 	// has 100 because of full rescan when bookfixed:1
 
 	it('should have 100 orders in buy book', function(){
@@ -1135,7 +1143,7 @@ describe('Market(options={})', function(){
         });
     });
 
-    
+
     describe('buy triggers another buy', function(){
         let scenario = [
             orders.id2_sell_1_at_95,
@@ -1218,8 +1226,8 @@ describe('Market(options={})', function(){
         it('should have 120 OCO stoplimit 100 as last sell book order', function(){
             omit2(AM.book.sell.idxdata(2)).should.deepEqual(orders.id4_sell_1_at_120_OCO_100);
         });
-    }); 
-    
+    });
+
 });
 
 describe('Market(options={bookfixed:1, booklimit:5, buyImprove:1})', function(){
@@ -1266,7 +1274,7 @@ describe('Market(options={bookfixed:1, booklimit:5, buyImprove:1})', function(){
                 buyId: [1],
                 sellId: [2],
                 buyA: [2],
-                sellA: [5]              
+                sellA: [5]
             });
         });
         it('should generate the correct second trade', function(){
@@ -1294,7 +1302,7 @@ describe('Market(options={bookfixed:1, booklimit:5, buyImprove:1})', function(){
                 buyId: [1],
                 sellId: [3],
                 buyA: [0],
-                sellA: [1]              
+                sellA: [1]
             });
         });
         it('.lastTradePrice() should return 100', function(){
@@ -1363,7 +1371,7 @@ describe('Market(options={bookfixed:1, booklimit:5, sellImprove:1})', function()
                 buyId: [1],
                 sellId: [2],
                 buyA: [2],
-                sellA: [1]              
+                sellA: [1]
             });
         });
         it('should generate the correct second trade', function(){
@@ -1383,7 +1391,7 @@ describe('Market(options={bookfixed:1, booklimit:5, sellImprove:1})', function()
         it('.lastTradePrice should return 115', function(){
             AM.lastTradePrice().should.equal(115);
         });
-        
+
         it('should have empty buy and sell books', function(){
             assert.ok(AM.book.buy.idx.length === 0);
             assert.ok(AM.book.sell.idx.length === 0);
@@ -1426,7 +1434,7 @@ describe('Market(options={bookfixed:1, booklimit:5, buySellBookLimit:1 })', func
                 buyId: [1],
                 sellId: [2],
                 buyA: [3],
-                sellA: [2]              
+                sellA: [2]
             });
         });
         it('should generate the correct second trade', function(){
@@ -1489,7 +1497,7 @@ describe('Market(options={bookfixed:1, booklimit:5, resetAfterEachTrade:1 })', f
                 buyId: [1],
                 sellId: [2],
                 buyA: [3],
-                sellA: [2]              
+                sellA: [2]
             });
         });
         it('.lastTradePrice() should return 105', function(){
@@ -1545,7 +1553,7 @@ describe('Market(options={bookfixed:1, booklimit:5, resetAfterEachTrade:1 })', f
                 buyId: [1],
                 sellId: [2],
                 buyA: [3],
-                sellA: [2]              
+                sellA: [2]
             });
         });
         it('should generate the correct second trade', function(){
