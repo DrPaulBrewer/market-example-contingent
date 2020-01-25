@@ -21,7 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "market-engine": "^1.1.1",
-    "market-pricing": "^1.3.0",
+    "market-pricing": "^1.4.0",
     "partial-index": "^1"
   },
   "devDependencies": {
