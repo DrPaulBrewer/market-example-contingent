@@ -552,7 +552,7 @@ export class Market extends MarketEngine {
     }
 
     /**
-     * empties trashed orders from book lists and scans active list to refill books.  
+     * empties trashed orders from book lists and scans active list to refill books.
      * Called by other methods as needed.  You probably won't need to call this function, unless implementing new functionality that affects the books or trashes orders.
      * @private
      */

@@ -2,9 +2,10 @@
 
 import assert from 'assert';
 import 'should';
-import * as marketExampleContingent from '../src/index.js';
-import * as orders from './orders.js';
+import * as marketExampleContingent from '../src/index.mjs';
+import * as ordersRAW from './orders.js';
 
+const orders = ordersRAW.default;
 const {Market, orderHeader, oa, ao} = marketExampleContingent;
 
 function process(M, orderList){

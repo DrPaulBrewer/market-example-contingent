@@ -1,12 +1,19 @@
 # market-example-contingent
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/DrPaulBrewer/market-example-contingent.svg)](https://greenkeeper.io/)
 [![Build Status](https://travis-ci.org/DrPaulBrewer/market-example-contingent.svg?branch=master)](https://travis-ci.org/DrPaulBrewer/market-example-contingent)
 [![Coverage Status](https://coveralls.io/repos/github/DrPaulBrewer/market-example-contingent/badge.svg?branch=master)](https://coveralls.io/github/DrPaulBrewer/market-example-contingent?branch=master)
 
 ### Provides exchange Market with time-based and cancellable limit orders, and contingent orders such as stop, OSO (one-sends-others) and OCO (one-cancels-others)
 
 Built using market-engine, market-pricing, and partial-index packages also posted on npm
+
+## Breaking Changes in v3
+
+### Module changes
+v3 is ESM whereas versions 2 and earlier were commonjs.
+
+### removing babel dependencies
+v3 is not compiled with Babel
 
 ## Installation
 
@@ -40,7 +47,7 @@ MEC.Market
 
 This means `MEC.Market` understands `.push(some_order)` and `.trade(tradeSpec)` from
 [`market-engine`](https://www.npmjs.com/package/market-engine)
-as well as `.on('someEvent', function(params){ ... })` and `.emit('someEvent')` from 
+as well as `.on('someEvent', function(params){ ... })` and `.emit('someEvent')` from
 [`EventEmitter`](https://nodejs.org/dist/latest-v4.x/docs/api/events.html).
 
 # Usage
@@ -50,18 +57,18 @@ as well as `.on('someEvent', function(params){ ... })` and `.emit('someEvent')` 
 The [primary documentation for market-example-contingent is on ESDoc](https://doc.esdoc.org/github.com/DrPaulBrewer/market-example-contingent/)
 
 ## Creating Event Handlers
-   
-    XMarket.on('trade', function(tradespec){ 
+
+    XMarket.on('trade', function(tradespec){
           // react to trade, do logging, etc.
     });
 
     XMarket.on('stops', function(t, matches){
            // t is the official time of the order
-           // matches is a two element array [nbuystops,nsellstops] 
+           // matches is a two element array [nbuystops,nsellstops]
     });
 
     XMarket.on('order', function(myorder){
-           // something to do on every order 
+           // something to do on every order
     });
 
     XMarket.on('before-order', function(myorder){
@@ -80,12 +87,12 @@ See also the MarketEngine documentation in package `market-engine`, as the marke
 // 0      counter: // strictly increasing, may have gaps
 // 1      tlocal: // local insertion time   (numeric JS timestamp)
 // 2      t: // official time
-// 3      tx: // expiration time, in units of official time 
+// 3      tx: // expiration time, in units of official time
 // 4      u: user number
 // 5      c: // 1 to cancel all active orders by userid
 // 6      q: // quantity (could be 0)
 // 7      b: // limit order price to buy
-// 8      s: // limit order price to sell 
+// 8      s: // limit order price to sell
 // 9      bs: // buy stop.  rising price triggers market order to buy (numeric)
 // 10     bsp: // buy stop limit price. buy limit price sent when trade price is greater than or equal to stop
 // 11     ss: // sell stop. falling price triggers market order to sell (numeric)
@@ -101,13 +108,13 @@ See also the MarketEngine documentation in package `market-engine`, as the marke
 
 ## Order Lifecycle
 
-An `order` begins life as 17 element numeric arrays, consisting of elements 2-18 above. 
+An `order` begins life as 17 element numeric arrays, consisting of elements 2-18 above.
 
 Generally, new orders should be pushed to an array `XMarket.inbox` used as a holding area and processsed in a loop similar to the following:
 
     while(XMarket.inbox.length)
         XMarket.push(XMarket.inbox.shift());
-        
+
 This is because the execution of orders can trigger other orders, which are pushed to the `.inbox` internally in order
 to avoid issues of re-entrancy.  The market procedues are not designed to be reentrant.
 
@@ -117,15 +124,13 @@ the highest active buy price.  Orders that are not rejected are appended to the 
 
 If the order is not rejected, the order number and local insertion timestamp are prepended as array elements 0 and 1,
 and the order is inserted into the active array `XMarket.a` and indexed in relevant order books. There are four order books
-which are partial indexes of active buy, sell, buyStop and sellStop orders. 
+which are partial indexes of active buy, sell, buyStop and sellStop orders.
 
-When a matching order arrives from the other side of the market, the matched orders have their order quantities 
+When a matching order arrives from the other side of the market, the matched orders have their order quantities
 decremented by the traded quantity and a `trade(tradespec)` event is fired. Other pieces of software that perform
-accounting, log trades, or update displays may wish to set a `.on('trade', function(){...})` listener for event `trade`. 
+accounting, log trades, or update displays may wish to set a `.on('trade', function(){...})` listener for event `trade`.
 
 After processing and emitting a trade, if any order in the trade has trigger fields, a new order is pushed to the
 inbox, transforming the trigger fields to regular order fields and using the old order's quantity traded (not quantity
 ordered) as the new quantity.  After creating orders from triggers, stop/stop-limit orders are checked and, if the
 stop loss criterion is met, converted into new limit orders.
-
-

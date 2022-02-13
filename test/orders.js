@@ -290,7 +290,5 @@ module.exports = {
 	0,0,    // trigger buy stop
 	0,0     // trigger sell stop
     ]
-    
+
 }
-
-
