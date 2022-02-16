@@ -1,8 +1,9 @@
 # market-example-contingent
 
 ![Build Status](https://github.com/DrPaulBrewer/market-example-contingent/actions/workflows/node.js.yml/badge.svg)
-
 [![Known Vulnerabilities](https://snyk.io/test/github/DrPaulBrewer/market-example-contingent/badge.svg)](https://snyk.io/test/github/DrPaulBrewer/market-example-contingent)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/DrPaulBrewer/market-example-contingent.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/DrPaulBrewer/market-example-contingent/context:javascript)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/DrPaulBrewer/market-example-contingent.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/DrPaulBrewer/market-example-contingent/alerts/)
 
 
 
