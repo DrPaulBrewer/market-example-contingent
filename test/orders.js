@@ -129,6 +129,24 @@ module.exports = {
 	0,0     // trigger sell stop
     ],
 
+    id2_sell_1_at_125_stop_100_oco: [
+  0,    // t
+  0,    // tx
+  2,    // usernum
+  0,    // cancelreplace
+  1,    // quantity
+  0,    // buy price
+  125,   // sell price
+  0,    // buy stop
+  0,
+  100,    // sell stop
+  1,    // stop limit price
+  0,    // trigger buy price
+  0,    // trgger sell price
+  0,0,    // trigger buy stop
+  0,0     // trigger sell stop
+    ],
+
     id3_sellstop_1_at_112: [
 	0,    // t
 	0,    // tx
