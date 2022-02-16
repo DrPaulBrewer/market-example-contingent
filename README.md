@@ -1,5 +1,12 @@
 # market-example-contingent
 
+![Build Status](https://github.com/DrPaulBrewer/market-example-contingent/actions/workflows/node.js.yml/badge.svg)
+
+[![Known Vulnerabilities](https://snyk.io/test/github/DrPaulBrewer/market-example-contingent/badge.svg)]
+(https://snyk.io/test/github/DrPaulBrewer/market-example-contingent)
+
+
+
 ### Provides exchange Market with time-based and cancellable limit orders, and contingent orders such as stop, OSO (one-sends-others) and OCO (one-cancels-others)
 
 Built using market-engine, market-pricing, and partial-index packages also posted on npm
