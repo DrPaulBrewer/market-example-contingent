@@ -497,7 +497,9 @@ export class Market extends MarketEngine {
          * @type {number} this.book.limit
          */
 
-        this.book.limit = this.o.booklimit || 100;
+        // defaults defined in constructor now so dont need to || 100
+        // this.book.limit = this.o.booklimit || 100;  PJB 2022-02-16
+        this.book.limit = this.o.booklimit;
 
         /**
          * indicator that book is fixed-size (true) or accordian (false)

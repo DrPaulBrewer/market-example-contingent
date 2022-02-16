@@ -1404,7 +1404,7 @@ describe('Market(options={bookfixed:1, booklimit:5, sellImprove:1})', function()
     });
 });
 
-describe('Market(options={bookfixed:1, booklimit:5, buySellBookLimit:1 })', function(){
+describe('Market(options={bookfixed:false, booklimit:2, buySellBookLimit:1 })', function(){
     describe('sell 1@115, 1@125, 1@105, buy 1@110, 1@120 ', function(){
         // when buy 1@110 matches sell 1@105, the sell book becomes 1@115, as 1@125 is discarded
         let scenario = [
@@ -1414,7 +1414,7 @@ describe('Market(options={bookfixed:1, booklimit:5, buySellBookLimit:1 })', func
             orders.id1_buy_1_at_110,
             orders.id1_buy_1_at_120
         ];
-        let AM = new Market({bookfixed:1, booklimit:5, buySellBookLimit: 1});
+        let AM = new Market({bookfixed:false, booklimit:2, buySellBookLimit: 1});
         let trades=[];
         AM.on('trade', function(tradespec){ trades.push(tradespec); });
         process(AM, scenario);
@@ -1462,6 +1462,83 @@ describe('Market(options={bookfixed:1, booklimit:5, buySellBookLimit:1 })', func
         it('should have empty buyStop and sellStop books', function(){
             assert.ok(AM.book.buyStop.idx.length === 0);
             assert.ok(AM.book.sellStop.idx.length === 0);
+        });
+    });
+
+    describe('sell 1@115, 1@125 stop 100 oco, 1@105, buy 1@110, 1@120 ', function(){
+        // when buy 1@110 matches sell 1@105, the sell book becomes 1@115, 1@125
+        // the result is different because oco orders are not discared by buysellbooklimit rule
+        let scenario = [
+            orders.id2_sell_1_at_115,
+            orders.id2_sell_1_at_125_stop_100_oco,
+            orders.id2_sell_1_at_105,
+            orders.id1_buy_1_at_110,
+            orders.id1_buy_1_at_120
+        ];
+        let AM = new Market({bookfixed:false, booklimit:2, buySellBookLimit: 1});
+        let trades=[];
+        AM.on('trade', function(tradespec){ trades.push(tradespec); });
+        process(AM, scenario);
+        it('should have empty inbox', function(){
+            assert.equal(AM.inbox.length, 0);
+        });
+        it('should generate 2 trades', function(){
+            assert.equal(trades.length, 2);
+        });
+        it('should generate the correct first trade', function(){
+            trades[0].should.deepEqual({
+                t: 0,
+                bs: 'b',
+                prices: [105],
+                totalQ: 1,
+                buyQ: [1],
+                sellQ: [1],
+                buyId: [1],
+                sellId: [2],
+                buyA: [3],
+                sellA: [2]
+            });
+        });
+        it('should generate the correct second trade', function(){
+            trades[1].should.deepEqual({
+                t:0,
+                bs: 'b',
+                prices: [115],
+                totalQ: 1,
+                buyQ: [1],
+                sellQ: [1],
+                buyId: [1],
+                sellId: [2],
+                buyA: [2],
+                sellA: [0]
+            });
+        });
+        it('.lastTradePrice() should return 115', function(){
+            AM.lastTradePrice().should.equal(115);
+        });
+        it('should have empty buy book and 1 order in sell book', function(){
+            assert.ok(AM.book.buy.idx.length === 0);
+            assert.ok(AM.book.sell.idx.length === 1);
+        });
+        it('should have empty buyStop and 1 order in sellStop books', function(){
+            assert.ok(AM.book.buyStop.idx.length === 0);
+            assert.ok(AM.book.sellStop.idx.length === 1);
+        });
+        it('AM.stopsTrigger(0) [missing param] should have no affect on book order lengths', function(){
+            AM.stopsTrigger(0);
+            assert.ok(AM.a.length===1);
+            assert.ok(AM.book.buy.idx.length === 0);
+            assert.ok(AM.book.sell.idx.length === 1);
+            assert.ok(AM.book.buyStop.idx.length === 0);
+            assert.ok(AM.book.sellStop.idx.length === 1);
+        });
+        it('AM.triggerOrderToInbox() [missing params] should have no affect on book order lengths', function(){
+          AM.triggerOrderToInbox();
+          assert.ok(AM.a.length===1);
+          assert.ok(AM.book.buy.idx.length === 0);
+          assert.ok(AM.book.sell.idx.length === 1);
+          assert.ok(AM.book.buyStop.idx.length === 0);
+          assert.ok(AM.book.sellStop.idx.length === 1);
         });
     });
 

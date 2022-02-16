@@ -1,8 +1,5 @@
 # market-example-contingent
 
-[![Build Status](https://travis-ci.org/DrPaulBrewer/market-example-contingent.svg?branch=master)](https://travis-ci.org/DrPaulBrewer/market-example-contingent)
-[![Coverage Status](https://coveralls.io/repos/github/DrPaulBrewer/market-example-contingent/badge.svg?branch=master)](https://coveralls.io/github/DrPaulBrewer/market-example-contingent?branch=master)
-
 ### Provides exchange Market with time-based and cancellable limit orders, and contingent orders such as stop, OSO (one-sends-others) and OCO (one-cancels-others)
 
 Built using market-engine, market-pricing, and partial-index packages also posted on npm
