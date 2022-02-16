@@ -2,8 +2,7 @@
 
 ![Build Status](https://github.com/DrPaulBrewer/market-example-contingent/actions/workflows/node.js.yml/badge.svg)
 
-[![Known Vulnerabilities](https://snyk.io/test/github/DrPaulBrewer/market-example-contingent/badge.svg)]
-(https://snyk.io/test/github/DrPaulBrewer/market-example-contingent)
+[![Known Vulnerabilities](https://snyk.io/test/github/DrPaulBrewer/market-example-contingent/badge.svg)](https://snyk.io/test/github/DrPaulBrewer/market-example-contingent)
 
 
 
