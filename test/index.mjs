@@ -1524,7 +1524,7 @@ describe('Market(options={bookfixed:false, booklimit:2, buySellBookLimit:1 })', 
             assert.ok(AM.book.buyStop.idx.length === 0);
             assert.ok(AM.book.sellStop.idx.length === 1);
         });
-        it('AM.stopsTrigger(0) [missing param] should have no affect on book order lengths', function(){
+        it('AM.stopsTrigger(0) [missing param] should throw error and have no affect on book order lengths', function(){
             AM.stopsTrigger(0);
             assert.ok(AM.a.length===1);
             assert.ok(AM.book.buy.idx.length === 0);
@@ -1532,16 +1532,44 @@ describe('Market(options={bookfixed:false, booklimit:2, buySellBookLimit:1 })', 
             assert.ok(AM.book.buyStop.idx.length === 0);
             assert.ok(AM.book.sellStop.idx.length === 1);
         });
-        it('AM.triggerOrderToInbox() [missing params] should have no affect on book order lengths', function(){
-          AM.triggerOrderToInbox();
-          assert.ok(AM.a.length===1);
-          assert.ok(AM.book.buy.idx.length === 0);
-          assert.ok(AM.book.sell.idx.length === 1);
-          assert.ok(AM.book.buyStop.idx.length === 0);
-          assert.ok(AM.book.sellStop.idx.length === 1);
+        describe('AM.triggerOrderToInbox() with bad parameters:', function(){
+          const tests = [
+            [[],/invalid order j/],
+            [[0],/invalid quantity q/],
+            [[0,1], /invalid time t/],
+            [['foo'], /invalid order j/],
+            [[0,3], /invalid quantity q/],
+            [[1,0], /invalid order j/],
+            [[0,-1], /invalid quantity q/]
+          ];
+          tests.forEach(function([badParam, regexp]){
+            it(`(${badParam}) will throw an error and not affect book lengths`, function(){
+              function bad(){
+                AM.triggerOrderToInbox(...badParam);
+              }
+              bad.should.throw(regexp);
+              assert.ok(AM.a.length===1);
+              assert.ok(AM.book.buy.idx.length === 0);
+              assert.ok(AM.book.sell.idx.length === 1);
+              assert.ok(AM.book.buyStop.idx.length === 0);
+              assert.ok(AM.book.sellStop.idx.length === 1);
+            });
+          });
+        });
+        describe('AM.triggerOrderToInbox(0,1,0) should add sell order to inbox', function(){
+          AM.triggerOrderToInbox(0,1,0);
+          it('does not affect book lengths', function(){
+            assert.ok(AM.a.length===1);
+            assert.ok(AM.book.buy.idx.length === 0);
+            assert.ok(AM.book.buyStop.idx.length === 0);
+            assert.ok(AM.book.sell.idx.length === 1);
+            assert.ok(AM.book.sellStop.idx.length === 1);
+          });
+          it('.inbox has length 0 because no OSO orders', function(){
+            assert.ok(AM.inbox.length === 0);
+          });
         });
     });
-
 });
 
 describe('Market(options={bookfixed:1, booklimit:5, resetAfterEachTrade:1 })', function(){
