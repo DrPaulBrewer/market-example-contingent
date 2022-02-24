@@ -425,8 +425,6 @@ export class Market extends MarketEngine {
      */
 
     triggerOrderToInbox(j,q,t){
-        if ((j===undefined) || (!q)) return;
-        const myorder = this.a[j];
         const o = this.o;
         const qCol = o.qCol;
         const bpCol = o.bpCol;
@@ -435,23 +433,30 @@ export class Market extends MarketEngine {
         const trigSliceBegin = o.trigSliceBegin;
         const trigSliceEnd = o.trigSliceEnd;
         const inbox = this.inbox;
-        if (myorder && (myorder[qCol]>=q)){
-            if ((myorder[trigSliceBegin]>0) ||
-                (myorder[trigSliceBegin+1]>0) ||
-                (myorder[trigSliceBegin+2]>0) ||
-                (myorder[trigSliceBegin+3]>0) ||
-                (myorder[trigSliceBegin+4]>0) ||
-                (myorder[trigSliceBegin+5]>0)){
-                let trigorder = [];
-                for(let ii=0,ll=trigSliceEnd-2;ii<ll;++ii)
-                    trigorder[ii] = 0;
-                trigorder[tCol-2] = t;
-                trigorder[idCol-2] = myorder[idCol];
-                trigorder[qCol-2] = q;
-                for(let ii=0,ll=trigSliceEnd-trigSliceBegin;ii<ll;++ii)
-                    trigorder[bpCol+ii-2] = myorder[ii+trigSliceBegin];
-                inbox.push(trigorder);
-            }
+        const l = +(this.a && this.a.length);
+        if (!(Number.isFinite(j)) || (j<0) || (j>=l))
+          throw new ReferenceError(`triggerOrderToInbox(j,q,t) invalid order j got:${j}, expected: 0 to ${l-1}`);
+        const myorder = this.a[j];
+        const myorderQ = myorder[qCol];
+        if (!(Number.isFinite(q)) || (q<0) || (q>myorderQ))
+          throw new RangeError(`triggerOrderToInbox(j,q,t) invalid quantity q got:${q}, expected: 0 to ${myorderQ}`);
+        if (!(Number.isFinite(t)))
+          throw new RangeError(`triggerOrderToInbox(j,q,t) invalid time t got:${t}, expected finite number`);
+        if ((myorder[trigSliceBegin]>0) ||
+            (myorder[trigSliceBegin+1]>0) ||
+            (myorder[trigSliceBegin+2]>0) ||
+            (myorder[trigSliceBegin+3]>0) ||
+            (myorder[trigSliceBegin+4]>0) ||
+            (myorder[trigSliceBegin+5]>0)){
+            let trigorder = [];
+            for(let ii=0,ll=trigSliceEnd-2;ii<ll;++ii)
+                trigorder[ii] = 0;
+            trigorder[tCol-2] = t;
+            trigorder[idCol-2] = myorder[idCol];
+            trigorder[qCol-2] = q;
+            for(let ii=0,ll=trigSliceEnd-trigSliceBegin;ii<ll;++ii)
+                trigorder[bpCol+ii-2] = myorder[ii+trigSliceBegin];
+            inbox.push(trigorder);
         }
     }
 
