@@ -353,6 +353,30 @@ export class Market extends MarketEngine {
     }
 
     /**
+     * rewrites some orders from a specific book via a order transformation function
+     * @param {number} n number of orders taken from natural sort of book
+     * @param {object} book The source order book
+     * @param {function} transformer The order transformation functional
+     * @private
+     */
+
+    rewriteOrders(n,book,transformer){
+      if (n>0){
+          const bookLength = book.idx.length;
+          if (n>bookLength)
+            throw new RangeError(`rewriteOrders(n,book,transformer) got n=${n} expected 0 to ${bookLength}`);
+          const newOrders = (book
+                             .idxdata()
+                             .slice(0,n)
+                             .map(transformer)
+                            );
+          const trashIdxs = book.idx.slice(0,n);
+          this.inbox.push(...newOrders);
+          this.trash.push(...trashIdxs);
+      }
+    }
+
+    /**
      * changes a portion or all of one or more stop orders into limit orders for execution that are pushed into .inbox
      * @param {number} t Effective time.
      * @param {matches} two element array from Market#stopsMatch
@@ -360,8 +384,11 @@ export class Market extends MarketEngine {
      */
 
     stopsTrigger(t, matches){
+        if (!(Number.isFinite(t)))
+          throw new RangeError(`.stopsTrigger(t,matches) requires t to be a finite number, got:${t}`);
+        const [numberOfBuystops,numberOfSellstops] = matches;
+        // number_of_buystops and number_of_sellstops range checked in this,rewriteOrders
         const o = this.o;
-        if (!matches) return;
         function toBuyAtMarket(buystop){
             const neworder = buystop.slice();  // includes triggers in copies, if any
             neworder[o.tCol] = t;
@@ -390,28 +417,8 @@ export class Market extends MarketEngine {
             neworder.splice(0,2);
             return neworder;
         }
-        if (matches[0]){
-            const bs = this.book.buyStop;
-            const newOrders = (bs
-                               .idxdata()
-                               .slice(0,matches[0])
-                               .map(toBuyAtMarket)
-                              );
-            const trashIdxs = bs.idx.slice(0,matches[0]);
-            this.inbox.push(...newOrders);
-            this.trash.push(...trashIdxs);
-        }
-        if (matches[1]){
-            const ss = this.book.sellStop;
-            const newOrders = (ss
-                               .idxdata()
-                               .slice(0,matches[1])
-                               .map(toSellAtMarket)
-                              );
-            const trashIdxs = ss.idx.slice(0,matches[1]);
-            this.inbox.push(...newOrders);
-            this.trash.push(...trashIdxs);
-        }
+        this.rewriteOrders(numberOfBuystops,this.book.buyStop,toBuyAtMarket);
+        this.rewriteOrders(numberOfSellstops,this.book.sellStop,toSellAtMarket);
         this.cleanup();
     }
 
