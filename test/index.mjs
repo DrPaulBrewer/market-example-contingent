@@ -1524,9 +1524,9 @@ describe('Market(options={bookfixed:false, booklimit:2, buySellBookLimit:1 })', 
             assert.ok(AM.book.buyStop.idx.length === 0);
             assert.ok(AM.book.sellStop.idx.length === 1);
         });
-        it('AM.rewriteOrders(2,AM.book.buyStop,()=>()) should throw error', function(){
+        it('AM.rewriteOrders(2,AM.book.buyStop) should throw error', function(){
             function bad(){
-              AM.rewriteOrders(2,AM.book.buyStop,function(){});
+              AM.rewriteOrders(2,AM.book.buyStop);
             }
             bad.should.throw(/got n=2 expected 0 to 0/);
         });
