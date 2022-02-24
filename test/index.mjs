@@ -1524,8 +1524,28 @@ describe('Market(options={bookfixed:false, booklimit:2, buySellBookLimit:1 })', 
             assert.ok(AM.book.buyStop.idx.length === 0);
             assert.ok(AM.book.sellStop.idx.length === 1);
         });
-        it('AM.stopsTrigger(0) [missing param] should throw error and have no affect on book order lengths', function(){
-            AM.stopsTrigger(0);
+        it('AM.rewriteOrders(2,AM.book.buyStop,()=>()) should throw error', function(){
+            function bad(){
+              AM.rewriteOrders(2,AM.book.buyStop,function(){});
+            }
+            bad.should.throw(/got n=2 expected 0 to 0/);
+        });
+        it('AM.stopsTrigger("foo") should throw error and have no effect on book order lengths',function(){
+          function bad(){
+            AM.stopsTrigger("foo");
+          }
+          bad.should.throw(/requires t to be a finite number/);
+          assert.ok(AM.a.length===1);
+          assert.ok(AM.book.buy.idx.length === 0);
+          assert.ok(AM.book.sell.idx.length === 1);
+          assert.ok(AM.book.buyStop.idx.length === 0);
+          assert.ok(AM.book.sellStop.idx.length === 1);
+        });
+        it('AM.stopsTrigger(0) [missing param] should throw error and have no effect on book order lengths', function(){
+            function bad(){
+              AM.stopsTrigger(0);
+            }
+            bad.should.throw(/matches is not iterable/);
             assert.ok(AM.a.length===1);
             assert.ok(AM.book.buy.idx.length === 0);
             assert.ok(AM.book.sell.idx.length === 1);
